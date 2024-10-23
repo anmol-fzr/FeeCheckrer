@@ -3,6 +3,7 @@ import { newUserSchema, updateUserSchema } from "../schema";
 import { zValidator } from "@hono/zod-validator";
 import { User } from "../model";
 import mongoose from "mongoose";
+
 const ObjectId = mongoose.Types.ObjectId;
 
 const { createHandlers } = createFactory();
@@ -35,18 +36,16 @@ const newAdminHndlr = createHandlers(
     });
 
     try {
-    const savedAdmin = await newAdmin.save();
-    savedAdmin.password = "";
+      const savedAdmin = await newAdmin.save();
+      savedAdmin.password = "";
 
-    return c.json({
-      data: savedAdmin,
-      message: "Admin Created Successfully",
-      success: true,
-    });
-
+      return c.json({
+        data: savedAdmin,
+        message: "Admin Created Successfully",
+        success: true,
+      });
     } catch (error) {
-
-      console.log(error)
+      console.log(error);
       return c.json(
         {
           message: "Admin with this email / phone number already exists",
@@ -61,13 +60,10 @@ const newAdminHndlr = createHandlers(
 
 const getAdminHndlr = createHandlers(async (c) => {
   const { _id } = c.get("jwtPayload");
+  const adminId = c.req.param("adminId");
+  const { deptId = null } = c.req.query();
 
-  const users = await User.aggregate([
-    {
-      $match: {
-        role: "hod",
-      },
-    },
+  const pipeline = [
     {
       $lookup: {
         from: "users",
@@ -112,13 +108,38 @@ const getAdminHndlr = createHandlers(async (c) => {
     },
     {
       $sort: {
-        createdAt: -1
-      }
-    }
-  ]);
+        createdAt: -1,
+      },
+    },
+  ];
+
+  if (deptId !== null) {
+    pipeline.unshift({
+      $match: {
+        deptId: new ObjectId(deptId),
+      },
+    });
+  }
+
+  pipeline.push(
+    adminId
+      ? {
+          $match: {
+            role: "hod",
+            _id: new ObjectId(adminId),
+          },
+        }
+      : {
+          $match: {
+            role: "hod",
+          },
+        },
+  );
+
+  const users = await User.aggregate(pipeline);
 
   return c.json({
-    data: users,
+    data: adminId ? users[0] : users,
     message: "All Users",
   });
 });

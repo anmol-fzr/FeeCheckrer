@@ -10,6 +10,7 @@ adminRouter.use(byRole("superadmin"));
 adminRouter
   .get("/", ...getAdminHndlr)
   .post(...newAdminHndlr)
-  .patch("/:adminId", ...updateAdminHndlr);
+  .get("/:adminId", ...getAdminHndlr)
+  .patch(...updateAdminHndlr);
 
 export { adminRouter };

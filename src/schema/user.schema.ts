@@ -8,12 +8,6 @@ const newUserSchema = z.object({
   password: z.string(),
 });
 
-const updateUserSchema = newUserSchema
-  .pick({
-    name: true,
-    mobile: true,
-    email: true,
-  })
-  .merge(newUserSchema.pick({ password: true }).partial());
+const updateUserSchema = newUserSchema.partial()
 
 export { newUserSchema, updateUserSchema };

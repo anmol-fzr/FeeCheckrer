@@ -3,3 +3,4 @@ export * from "./adminController";
 export * from "./clerkController";
 export * from "./deptController";
 export * from "./metaController";
+export * from "./courseController";
