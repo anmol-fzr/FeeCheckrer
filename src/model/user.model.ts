@@ -9,9 +9,9 @@ type IUser = {
   mobile: number;
   email: string;
   password: string;
+  deletedAt: Date;
   role: Role;
   createdBy?: ObjectId;
-  deptId: ObjectId;
 };
 
 const userSchema = new Schema<IUser, Model<IUser>>(
@@ -49,10 +49,10 @@ const userSchema = new Schema<IUser, Model<IUser>>(
       required: false,
       index: true,
     },
-    deptId: {
-      type: Schema.Types.ObjectId,
+    deletedAt: {
+      type: Schema.Types.Date,
+      default: Date.now(),
       required: false,
-      index: true,
     },
   },
   {

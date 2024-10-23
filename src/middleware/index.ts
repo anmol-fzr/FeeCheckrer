@@ -13,3 +13,4 @@ const jwt = createMiddleware(async (c, next) => {
 
 export { jwt };
 export * from "./role.middleware";
+export * from "./paginate.middleware";

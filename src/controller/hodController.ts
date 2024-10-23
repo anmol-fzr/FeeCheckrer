@@ -8,47 +8,40 @@ const ObjectId = mongoose.Types.ObjectId;
 
 const { createHandlers } = createFactory();
 
-const newAdminHndlr = createHandlers(
+const newHodHndlr = createHandlers(
   zValidator("json", newUserSchema),
   async (c) => {
     const { _id: userId } = c.get("jwtPayload");
-    const {
-      name,
-      mobile,
-      email,
-      password: rawPassword,
-      deptId,
-    } = c.req.valid("json");
+    const { name, mobile, email, password: rawPassword } = c.req.valid("json");
 
     const password = await Bun.password.hash(rawPassword, {
       algorithm: "bcrypt",
       cost: 4,
     });
 
-    const newAdmin = new User({
+    const newHod = new User({
       name,
       mobile,
       email,
       password,
-      deptId,
       role: "hod",
       createdBy: userId,
     });
 
     try {
-      const savedAdmin = await newAdmin.save();
-      savedAdmin.password = "";
+      const savedHod = await newHod.save();
+      savedHod.password = "";
 
       return c.json({
-        data: savedAdmin,
-        message: "Admin Created Successfully",
+        data: savedHod,
+        message: "Hod Created Successfully",
         success: true,
       });
     } catch (error) {
       console.log(error);
       return c.json(
         {
-          message: "Admin with this email / phone number already exists",
+          message: "Hod with this email / phone number already exists",
           success: false,
           error,
         },
@@ -58,10 +51,9 @@ const newAdminHndlr = createHandlers(
   },
 );
 
-const getAdminHndlr = createHandlers(async (c) => {
+const getHodHndlr = createHandlers(async (c) => {
   const { _id } = c.get("jwtPayload");
   const adminId = c.req.param("adminId");
-  const { deptId = null } = c.req.query();
 
   const pipeline = [
     {
@@ -79,20 +71,6 @@ const getAdminHndlr = createHandlers(async (c) => {
       },
     },
     {
-      $lookup: {
-        from: "depts",
-        localField: "deptId",
-        foreignField: "_id",
-        as: "dept",
-      },
-    },
-    {
-      $unwind: {
-        path: "$dept",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
       $addFields: {
         "createdBy.isCreatedByMe": {
           $eq: ["$createdBy._id", new ObjectId(_id)],
@@ -102,7 +80,6 @@ const getAdminHndlr = createHandlers(async (c) => {
     {
       $project: {
         password: 0,
-        deptId: 0,
         "createdBy.password": 0,
       },
     },
@@ -112,14 +89,6 @@ const getAdminHndlr = createHandlers(async (c) => {
       },
     },
   ];
-
-  if (deptId !== null) {
-    pipeline.unshift({
-      $match: {
-        deptId: new ObjectId(deptId),
-      },
-    });
-  }
 
   pipeline.push(
     adminId
@@ -144,7 +113,7 @@ const getAdminHndlr = createHandlers(async (c) => {
   });
 });
 
-const updateAdminHndlr = createHandlers(
+const updateHodHndlr = createHandlers(
   zValidator("json", updateUserSchema),
   async (c) => {
     const id = c.req.param("adminId");
@@ -157,24 +126,24 @@ const updateAdminHndlr = createHandlers(
       });
     }
 
-    const foundAdmin = await User.findByIdAndUpdate(id, updatePayload, {
+    const foundHod = await User.findByIdAndUpdate(id, updatePayload, {
       new: true,
     });
 
-    if (!foundAdmin) {
+    if (!foundHod) {
       return c.json({
-        message: "Admin doesn't exists",
+        message: "Hod doesn't exists",
       });
     }
 
-    const savedAdmin = await foundAdmin.save();
+    const savedHod = await foundHod.save();
 
     return c.json({
       id,
-      data: savedAdmin,
-      message: "Admin Updated Successfully",
+      data: savedHod,
+      message: "Hod Updated Successfully",
     });
   },
 );
 
-export { newAdminHndlr, getAdminHndlr, updateAdminHndlr };
+export { newHodHndlr, getHodHndlr, updateHodHndlr };
