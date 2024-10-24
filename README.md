@@ -22,7 +22,9 @@
 5. Start Docker Engine According to your own system\
 
 6. Start Docker Container
-```docker compose up -d```
+```
+docker compose up -d
+```
 
 ```
 - 
