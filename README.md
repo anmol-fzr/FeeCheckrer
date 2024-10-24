@@ -8,16 +8,24 @@
 ## Steps To Get Started
 
 1. Clone the main server ( FeeCheckrer )\
-```https://github.com/anmol-fzr/FeeCheckrer```
+```
+https://github.com/anmol-fzr/FeeCheckrer
+```
 
 2. Clone the admin application ( FeeCheckr )\
-``` https://github.com/anmol-fzr/FeeCheckr ```
+```
+https://github.com/anmol-fzr/FeeCheckrer
+```
 
 3. Clone the student application ( FeeGiver )\
-```https://github.com/anmol-fzr/FeeGiver```
+```
+https://github.com/anmol-fzr/FeeGiver
+```
 
 4. Copy `docker-compose.yaml` from `FeeCheckrer` to current directory\
-```cp ./FeeCheckrer/docker-compose.yaml ./```
+```
+cp ./FeeCheckrer/docker-compose.yaml ./
+```
 
 5. Start Docker Engine According to your own system\
 
