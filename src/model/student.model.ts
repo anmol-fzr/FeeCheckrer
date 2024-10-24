@@ -1,11 +1,13 @@
-import { Model, model, Schema } from "mongoose";
+import { Model, model, ObjectId, Schema } from "mongoose";
 
-type IUser = {
+type IStudent = {
   email: string;
+  isVerified: boolean;
   password: string;
+  details?: ObjectId;
 };
 
-const userSchema = new Schema<IUser, Model<IUser>>(
+const studentSchema = new Schema<IStudent, Model<IStudent>>(
   {
     email: {
       type: Schema.Types.String,
@@ -16,8 +18,16 @@ const userSchema = new Schema<IUser, Model<IUser>>(
     password: {
       type: Schema.Types.String,
       required: true,
-      index: true,
-      unique: true,
+    },
+    isVerified: {
+      type: Schema.Types.Boolean,
+      required: true,
+    },
+    details: {
+      type: Schema.Types.ObjectId,
+      ref: "studentDetails",
+      default: null,
+      required: false,
     },
   },
   {
@@ -26,6 +36,6 @@ const userSchema = new Schema<IUser, Model<IUser>>(
   },
 );
 
-const User = model<IUser>("student", userSchema);
+const Student = model<IStudent>("student", studentSchema);
 
-export { User };
+export { Student };

@@ -1,3 +1,6 @@
 const numsOnly = /^\d+$/;
+const atLeastOneNum = /[0-9]/;
+const atLeastOneUpperCase = /[A-Z]/;
+const atLeastOneLowerCase = /[a-z]/;
 
-export { numsOnly };
+export { atLeastOneNum, atLeastOneUpperCase, atLeastOneLowerCase, numsOnly };

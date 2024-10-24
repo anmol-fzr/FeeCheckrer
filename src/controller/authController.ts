@@ -1,5 +1,5 @@
 import { createFactory } from "hono/factory";
-import { loginSchema } from "../schema";
+import { stuLoginSchema } from "../schema";
 import { zValidator } from "@hono/zod-validator";
 import { User } from "../model";
 import { jwtsHelper } from "../helper/jwt.helper";
@@ -7,7 +7,7 @@ import { jwtsHelper } from "../helper/jwt.helper";
 const { createHandlers } = createFactory();
 
 const loginHndlr = createHandlers(
-  zValidator("json", loginSchema),
+  zValidator("json", stuLoginSchema),
   async (c) => {
     const { email, password: rawPassword } = c.req.valid("json");
 

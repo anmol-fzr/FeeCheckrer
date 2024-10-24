@@ -1,18 +1,17 @@
-import { Model, model, ObjectId, Schema } from "mongoose";
+import { Model, model, Schema } from "mongoose";
 
-type IUser = {
+type IStudentDetailsModel = {
   name: string;
   mobile: number;
   admissionNo: number;
   rollNo: number;
-
-  studentId: ObjectId; // DB internal
-  deptId: ObjectId;
-  courseId: ObjectId;
   batch: number; // will show current to back 5 years only
 };
 
-const userSchema = new Schema<IUser, Model<IUser>>(
+const studentDetailsSchema = new Schema<
+  IStudentDetailsModel,
+  Model<IStudentDetailsModel>
+>(
   {
     name: {
       type: Schema.Types.String,
@@ -21,24 +20,22 @@ const userSchema = new Schema<IUser, Model<IUser>>(
     mobile: {
       type: Schema.Types.Number,
       required: true,
-      index: true,
-      unique: true,
     },
-    email: {
-      type: Schema.Types.String,
+    admissionNo: {
+      type: Schema.Types.Number,
       required: true,
       index: true,
       unique: true,
     },
-    password: {
-      type: Schema.Types.String,
+    rollNo: {
+      type: Schema.Types.Number,
       required: true,
       index: true,
       unique: true,
     },
-    deptId: {
-      type: Schema.Types.ObjectId,
-      required: false,
+    batch: {
+      type: Schema.Types.Number,
+      required: true,
       index: true,
     },
   },
@@ -48,6 +45,9 @@ const userSchema = new Schema<IUser, Model<IUser>>(
   },
 );
 
-const User = model<IUser>("studentDetails", userSchema);
+const StudentDetails = model<IStudentDetailsModel>(
+  "studentDetails",
+  studentDetailsSchema,
+);
 
-export { User };
+export { StudentDetails };

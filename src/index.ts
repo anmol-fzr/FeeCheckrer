@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { startup } from "./helper";
 import { cors } from "hono/cors";
-import { authRouter, clerkRouter, hodRouter } from "./router";
+import { authRouter, clerkRouter, hodRouter, studentRouter } from "./router";
 import { logger } from "hono/logger";
 import { getMetaHndlr } from "./controller";
 
@@ -24,6 +24,8 @@ app.get("/", (c) => {
 app.route("/auth", authRouter);
 app.route("/hod", hodRouter);
 app.route("/clerk", clerkRouter);
+app.route("/student", studentRouter);
+
 app.get("/meta", ...getMetaHndlr);
 
 export default app;
