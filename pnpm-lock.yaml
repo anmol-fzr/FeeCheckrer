@@ -11,6 +11,9 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.4.1
         version: 0.4.1(hono@4.6.5)(zod@3.23.8)
+      change-case:
+        specifier: ^5.4.4
+        version: 5.4.4
       hono:
         specifier: ^4.6.5
         version: 4.6.5
@@ -57,6 +60,9 @@ packages:
 
   bun-types@1.1.30:
     resolution: {integrity: sha512-mGh7NLisOXskBU62DxLS+/nwmLlCYHYAkCzdo4DZ9+fzrpP41hAdOqaN4DO6tQfenHb4pYb0/shw29k4/6I2yQ==}
+
+  change-case@5.4.4:
+    resolution: {integrity: sha512-HRQyTk2/YPEkt9TnUPbOpr64Uw3KOicFWPVBb+xiHvd6eBx/qPr9xqfBFDT8P2vWsvvz4jbEkfDe71W3VyNu2w==}
 
   debug@4.3.7:
     resolution: {integrity: sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==}
@@ -186,6 +192,8 @@ snapshots:
     dependencies:
       '@types/node': 20.12.14
       '@types/ws': 8.5.12
+
+  change-case@5.4.4: {}
 
   debug@4.3.7:
     dependencies:

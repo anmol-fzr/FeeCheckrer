@@ -21,7 +21,8 @@ const studentSchema = new Schema<IStudent, Model<IStudent>>(
     },
     isVerified: {
       type: Schema.Types.Boolean,
-      required: true,
+      default: false,
+      required: false,
     },
     details: {
       type: Schema.Types.ObjectId,

@@ -1,17 +1,16 @@
-import { createFactory } from "hono/factory";
-import { loginSchema, registerSchema, stuOnboardSchema } from "../schema";
-import { zValidator } from "@hono/zod-validator";
-import { Student, StudentDetails } from "../model";
 import mongoose, { Aggregate, CastError } from "mongoose";
-import { passHelper } from "../helper";
-import { jwtsHelper } from "../helper/jwt.helper";
-import { jwt } from "../middleware";
+import { createFactory } from "hono/factory";
+import { zValidator } from "@hono/zod-validator";
+import { loginSchema, registerSchema, stuOnboardSchema } from "../../schema";
+import { Student, StudentDetails } from "../../model";
+import { passHelper, jwtsHelper } from "../../helper";
+import { jwt } from "../../middleware";
 
 const { createHandlers } = createFactory();
 
 const ObjectId = mongoose.Types.ObjectId;
 
-const loginStudentHndlr = createHandlers(
+const loginStuHndlr = createHandlers(
   zValidator("json", loginSchema),
   async (c) => {
     const { email, password: rawPass } = c.req.valid("json");
@@ -71,7 +70,7 @@ const loginStudentHndlr = createHandlers(
   },
 );
 
-const registerStudentHndlr = createHandlers(
+const registerStuHndlr = createHandlers(
   zValidator("json", registerSchema),
   async (c) => {
     const { email, password: rawPass } = c.req.valid("json");
@@ -87,7 +86,7 @@ const registerStudentHndlr = createHandlers(
     try {
       const savedStudent = await newStudent.save();
       const token = await jwtsHelper.getStudentToken({
-        _id: savedStudent._id.toString(),
+        studentId: savedStudent._id.toString(),
       });
 
       savedStudent.password = "";
@@ -229,9 +228,4 @@ const stuProfileHndlr = createHandlers(jwt, async (c) => {
   return c.json({ data: stu[0] });
 });
 
-export {
-  loginStudentHndlr,
-  registerStudentHndlr,
-  onboardStudentHndlr,
-  stuProfileHndlr,
-};
+export { loginStuHndlr, registerStuHndlr };

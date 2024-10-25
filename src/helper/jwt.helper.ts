@@ -9,7 +9,7 @@ type GetLoginTokenData = {
 };
 
 type GetStudentTokenData = {
-  _id: string;
+  studentId: string;
 };
 
 const jwtsHelper = {

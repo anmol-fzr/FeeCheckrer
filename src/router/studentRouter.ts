@@ -1,17 +1,8 @@
 import { Hono } from "hono";
-import {
-  loginStudentHndlr,
-  onboardStudentHndlr,
-  registerStudentHndlr,
-  stuProfileHndlr,
-} from "../controller";
+import { stuAuthRouter, stuProfileRouter } from "./student";
 
 const studentRouter = new Hono();
 
-studentRouter
-  .get("/", ...stuProfileHndlr)
-  .post("/login", ...loginStudentHndlr)
-  .post("/register", ...registerStudentHndlr)
-  .post("/onboard", ...onboardStudentHndlr);
+studentRouter.route("/profile", stuProfileRouter).route("/auth", stuAuthRouter);
 
 export { studentRouter };
