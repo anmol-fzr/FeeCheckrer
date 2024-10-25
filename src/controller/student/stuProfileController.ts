@@ -1,7 +1,7 @@
-import mongoose, { Aggregate, CastError } from "mongoose";
+import mongoose, { Aggregate } from "mongoose";
 import { createFactory } from "hono/factory";
 import { zValidator } from "@hono/zod-validator";
-import { stuOnboardSchema } from "../../schema";
+import { stuNewProfileSchema, stuProfileUpdateSchema } from "../../schema";
 import { Student, StudentDetails } from "../../model";
 import { jwt } from "../../middleware";
 import { unauth } from "../../helper";
@@ -13,7 +13,7 @@ const ObjectId = mongoose.Types.ObjectId;
 
 const newProfileHndlr = createHandlers(
   jwt,
-  zValidator("json", stuOnboardSchema),
+  zValidator("json", stuNewProfileSchema),
   async (c) => {
     const body = c.req.valid("json");
     const { studentId } = c.get("jwtPayload");
@@ -68,7 +68,7 @@ const newProfileHndlr = createHandlers(
 );
 
 const getProfileHndlr = createHandlers(jwt, async (c) => {
-  const { _id: studentId } = c.get("jwtPayload");
+  const { studentId } = c.get("jwtPayload");
   const aggr = new Aggregate();
 
   aggr.match({
@@ -107,12 +107,14 @@ const getProfileHndlr = createHandlers(jwt, async (c) => {
 
 const updateProfileHndlr = createHandlers(
   jwt,
-  zValidator("json", stuOnboardSchema),
+  zValidator("json", stuProfileUpdateSchema),
   async (c) => {
     const body = c.req.valid("json");
     const { studentId } = c.get("jwtPayload");
 
+    console.log(c.get("jwtPayload"));
     const student = await Student.findById(studentId).lean();
+    console.log(student, studentId);
     if (!student) {
       return unauth(c);
     }

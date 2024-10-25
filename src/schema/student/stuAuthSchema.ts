@@ -3,7 +3,7 @@ import {
   atLeastOneLowerCase,
   atLeastOneNum,
   atLeastOneUpperCase,
-} from "../utils";
+} from "../../utils";
 
 const passwordSchema = z
   .string()
