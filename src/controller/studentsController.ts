@@ -6,16 +6,19 @@
 import { Factory } from "hono/factory";
 import { Aggregate } from "mongoose";
 import { Student } from "../model";
+import { paginator } from "../middleware";
 
 const { createHandlers } = new Factory();
 
-const getStudentsHndlr = createHandlers(async (c) => {
+const getStudentsHndlr = createHandlers(paginator, async (c) => {
   const name = c.req.query("name");
   const id = c.req.query("id");
   const isVerified = c.req.query("isVerified");
   const email = c.req.query("email");
   const batchs = c.req.queries("batch");
   const completions = c.req.queries("completion");
+
+  const { limit, skip, page } = c.get("paginator");
 
   const aggr = new Aggregate();
 
@@ -86,6 +89,8 @@ const getStudentsHndlr = createHandlers(async (c) => {
     "details.name": 0,
     "details.batch": 0,
   });
+
+  aggr.skip(skip).limit(limit);
 
   aggr.sort({
     "details.createdAt": -1,
