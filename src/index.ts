@@ -1,13 +1,24 @@
 import { Hono } from "hono";
 import { startup } from "./helper";
 import { cors } from "hono/cors";
-import { authRouter, clerkRouter, hodRouter, studentRouter } from "./router";
+import {
+  authRouter,
+  clerkRouter,
+  hodRouter,
+  studentRouter,
+  studentsRouter,
+  feesRouter,
+} from "./router";
 import { logger } from "hono/logger";
-import { getMetaHndlr } from "./controller";
+import { xRespTime, httpCacheControll } from "./middleware";
 
 startup();
 
 const app = new Hono();
+
+app.use(xRespTime);
+app.use(httpCacheControll);
+
 app.use(
   cors({
     origin: "*",
@@ -16,16 +27,18 @@ app.use(
 
 app.use(logger());
 
-// Health Route
 app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-app.route("/auth", authRouter);
-app.route("/hod", hodRouter);
-app.route("/clerk", clerkRouter);
-app.route("/student", studentRouter);
+app
+  .route("/auth", authRouter)
+  .route("/hod", hodRouter)
+  .route("/clerk", clerkRouter)
+  .route("/student", studentRouter)
+  .route("/students", studentsRouter)
+  .route("/fees", feesRouter);
 
-app.get("/meta", ...getMetaHndlr);
+//app.get("/meta", ...getMetaHndlr);
 
 export default app;

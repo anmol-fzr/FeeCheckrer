@@ -4,6 +4,7 @@ type IStudent = {
   email: string;
   isVerified: boolean;
   password: string;
+  avatar?: string;
   details?: ObjectId;
 };
 
@@ -18,6 +19,10 @@ const studentSchema = new Schema<IStudent, Model<IStudent>>(
     password: {
       type: Schema.Types.String,
       required: true,
+    },
+    avatar: {
+      type: Schema.Types.String,
+      required: false,
     },
     isVerified: {
       type: Schema.Types.Boolean,

@@ -108,10 +108,7 @@ const getClerkHndlr = createHandlers(paginator, async (c) => {
     createdAt: -1,
   });
 
-  aggr.skip(skip); // skip must come before limit
-  aggr.limit(limit);
-
-  console.log({ limit, skip });
+  aggr.skip(skip).limit(limit);
 
   const pipeline = aggr.pipeline();
 

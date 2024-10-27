@@ -69,12 +69,13 @@ const loginStuHndlr = createHandlers(
 const registerStuHndlr = createHandlers(
   zValidator("json", registerSchema),
   async (c) => {
-    const { email, password: rawPass } = c.req.valid("json");
+    const { email, password: rawPass,avatar } = c.req.valid("json");
 
     const password = await passHelper.getHashedPassword(rawPass);
 
     const newStudent = new Student({
       email,
+      avatar,
       password,
       isVerified: false,
     });

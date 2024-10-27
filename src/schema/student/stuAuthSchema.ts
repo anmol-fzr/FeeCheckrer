@@ -31,6 +31,7 @@ const stuLoginSchema = z.object({
 const registerSchema = z.object({
   email: z.string().email(),
   password: passwordSchema,
+  avatar: z.string().optional(),
   //confirmPassword: passwordSchema,
 });
 //.refine((values) => values.password === values.confirmPassword, {

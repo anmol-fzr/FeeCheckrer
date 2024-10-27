@@ -5,6 +5,6 @@ const stuAuthRouter = new Hono();
 
 stuAuthRouter
   .post("/login", ...loginStuHndlr)
-  .patch("/register", ...registerStuHndlr);
+  .post("/register", ...registerStuHndlr);
 
 export { stuAuthRouter };

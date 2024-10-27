@@ -1,0 +1,143 @@
+/**
+ * This Fill is Intended to be used by only Admin Panel Users not by student
+ * For Student Side controller check `src/controller/student`
+ * */
+
+import { Factory } from "hono/factory";
+import { Aggregate } from "mongoose";
+import { Student } from "../model";
+
+const { createHandlers } = new Factory();
+
+const getStudentsHndlr = createHandlers(async (c) => {
+  const name = c.req.query("name");
+  const id = c.req.query("id");
+  const isVerified = c.req.query("isVerified");
+  const email = c.req.query("email");
+  const batchs = c.req.queries("batch");
+  const completions = c.req.queries("completion");
+
+  const aggr = new Aggregate();
+
+  aggr.lookup({
+    localField: "details",
+    foreignField: "_id",
+    from: "studentdetails",
+    as: "details",
+  });
+
+  aggr.unwind({
+    path: "$details",
+    preserveNullAndEmptyArrays: true,
+  });
+
+  if (id) {
+    aggr.match({
+      $expr: {
+        $regexMatch: {
+          input: { $toString: "$_id" },
+          regex: id,
+          options: "i",
+        },
+      },
+    });
+  }
+
+  if (isVerified) {
+    aggr.match({
+      isVerified: isVerified === "true",
+    });
+  }
+
+  if (completions && completions?.length === 1) {
+    const forComplete = completions[0] === "complete";
+    aggr.match({
+      details: {
+        [forComplete ? "$ne" : "$eq"]: null,
+      },
+    });
+  }
+
+  if (name) {
+    aggr.match({
+      "details.name": { $regex: name, $options: "i" },
+    });
+  }
+  if (email) {
+    aggr.match({
+      email: { $regex: email, $options: "i" },
+    });
+  }
+
+  if (batchs && batchs.length > 0) {
+    const numBatch = batchs.map(Number);
+
+    aggr.match({
+      "details.batch": { $in: numBatch },
+    });
+  }
+
+  aggr.addFields({
+    name: "$details.name",
+    batch: "$details.batch",
+  });
+
+  aggr.project({
+    "details.name": 0,
+    "details.batch": 0,
+  });
+
+  aggr.sort({
+    "details.createdAt": -1,
+  });
+
+  const pipeline = aggr.pipeline();
+  const students = await Student.aggregate(pipeline);
+
+  return c.json({ data: students });
+});
+
+const getStudentHndlr = createHandlers(async (c) => {
+  const studentId = c.req.param("studentId");
+
+  const aggr = new Aggregate();
+
+  aggr.lookup({
+    localField: "details",
+    foreignField: "_id",
+    from: "studentdetails",
+    as: "profile",
+  });
+
+  aggr.unwind({
+    path: "$profile",
+    preserveNullAndEmptyArrays: true,
+  });
+
+  aggr.lookup({
+    localField: "_id",
+    foreignField: "studentId",
+    from: "fees",
+    as: "fees",
+  });
+
+  aggr.match({
+    $expr: {
+      $regexMatch: {
+        input: { $toString: "$_id" },
+        regex: studentId,
+        options: "i",
+      },
+    },
+  });
+
+  const pipeline = aggr.pipeline();
+
+  const student = await Student.aggregate(pipeline);
+
+  return c.json({
+    data: student[0],
+  });
+});
+
+export { getStudentsHndlr, getStudentHndlr };

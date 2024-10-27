@@ -3,3 +3,4 @@ export * from "./dept.model";
 export * from "./course.model";
 export * from "./student.model";
 export * from "./studentDetails.model";
+export * from "./fee.model";

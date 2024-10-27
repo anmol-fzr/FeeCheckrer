@@ -1,8 +1,11 @@
 import { Hono } from "hono";
-import { stuAuthRouter, stuProfileRouter } from "./student";
+import { stuAuthRouter, stuFeeRouter, stuProfileRouter } from "./student";
 
 const studentRouter = new Hono();
 
-studentRouter.route("/profile", stuProfileRouter).route("/auth", stuAuthRouter);
+studentRouter
+  .route("/auth", stuAuthRouter)
+  .route("/profile", stuProfileRouter)
+  .route("/fee", stuFeeRouter);
 
 export { studentRouter };
