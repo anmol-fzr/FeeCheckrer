@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { startup } from "./helper";
 import { cors } from "hono/cors";
+import { etag } from "hono/etag";
 import {
   authRouter,
   clerkRouter,
@@ -18,6 +19,7 @@ const app = new Hono();
 
 app.use(xRespTime);
 app.use(httpCacheControll);
+app.use(etag());
 
 app.use(
   cors({

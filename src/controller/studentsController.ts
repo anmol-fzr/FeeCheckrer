@@ -90,6 +90,15 @@ const getStudentsHndlr = createHandlers(paginator, async (c) => {
     "details.batch": 0,
   });
 
+  let pipelineForCount = structuredClone(aggr.pipeline());
+  pipelineForCount.push({ $count: "total" });
+  pipelineForCount.push({
+    $unwind: {
+      path: "$total",
+      preserveNullAndEmptyArrays: true,
+    },
+  });
+
   aggr.skip(skip).limit(limit);
 
   aggr.sort({
@@ -98,8 +107,12 @@ const getStudentsHndlr = createHandlers(paginator, async (c) => {
 
   const pipeline = aggr.pipeline();
   const students = await Student.aggregate(pipeline);
+  const total = await Student.aggregate(pipelineForCount);
 
-  return c.json({ data: students });
+  return c.json({
+    paginate: total[0],
+    data: students,
+  });
 });
 
 const getStudentHndlr = createHandlers(async (c) => {

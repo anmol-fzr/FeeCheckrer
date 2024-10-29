@@ -72,7 +72,7 @@ const getClerkHndlr = createHandlers(paginator, async (c) => {
   const { _id } = c.get("jwtPayload");
   const adminId = c.req.param("clerkId");
 
-  const { limit, skip, page } = c.get("paginator");
+  const { limit, skip } = c.get("paginator");
 
   const aggr = new Aggregate();
 
@@ -104,6 +104,15 @@ const getClerkHndlr = createHandlers(paginator, async (c) => {
     "createdBy.password": 0,
   });
 
+  let pipelineForCount = structuredClone(aggr.pipeline());
+  pipelineForCount.push({ $count: "total" });
+  pipelineForCount.push({
+    $unwind: {
+      path: "$total",
+      preserveNullAndEmptyArrays: true,
+    },
+  });
+
   aggr.sort({
     createdAt: -1,
   });
@@ -113,22 +122,14 @@ const getClerkHndlr = createHandlers(paginator, async (c) => {
   const pipeline = aggr.pipeline();
 
   const users = await User.aggregate(pipeline);
-
-  const totalDocuments = await User.countDocuments({
-    role: "clerk",
-    ...(adminId && { _id: new ObjectId(adminId) }),
-  });
-
-  const totalPages = Math.ceil(totalDocuments / limit); // Total pages
+  const total = await User.aggregate(pipelineForCount);
 
   const data = adminId ? users[0] : users;
 
   return c.json({
-    data,
-    totalPages,
-    currPage: page,
-    currPageSize: limit,
+    paginate: total[0],
     message: "All Clerk",
+    data,
   });
 });
 
