@@ -2,7 +2,9 @@ import { createFactory } from "hono/factory";
 import { newUserSchema, updateUserSchema } from "../schema";
 import { zValidator } from "@hono/zod-validator";
 import { User } from "../model";
-import mongoose from "mongoose";
+import mongoose, { Aggregate } from "mongoose";
+import { paginator } from "../middleware";
+import { getAggrForPagintn } from "../utils";
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -51,63 +53,60 @@ const newHodHndlr = createHandlers(
   },
 );
 
-const getHodHndlr = createHandlers(async (c) => {
+const getHodHndlr = createHandlers(paginator, async (c) => {
   const { _id } = c.get("jwtPayload");
   const adminId = c.req.param("adminId");
 
-  const pipeline = [
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "createdBy",
-      },
-    },
-    {
-      $unwind: {
-        path: "$createdBy",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $addFields: {
-        "createdBy.isCreatedByMe": {
-          $eq: ["$createdBy._id", new ObjectId(_id)],
-        },
-      },
-    },
-    {
-      $project: {
-        password: 0,
-        "createdBy.password": 0,
-      },
-    },
-    {
-      $sort: {
-        createdAt: -1,
-      },
-    },
-  ];
+  const aggr = new Aggregate();
 
-  pipeline.push(
-    adminId
-      ? {
-          $match: {
-            role: "hod",
-            _id: new ObjectId(adminId),
-          },
-        }
-      : {
-          $match: {
-            role: "hod",
-          },
-        },
-  );
+  aggr.match({
+    role: "hod",
+    ...(adminId && { _id: new ObjectId(adminId) }),
+  });
+
+  aggr.lookup({
+    from: "users",
+    localField: "createdBy",
+    foreignField: "_id",
+    as: "createdBy",
+  });
+
+  aggr.unwind({
+    path: "$createdBy",
+    preserveNullAndEmptyArrays: true,
+  });
+
+  aggr.addFields({
+    "createdBy.isCreatedByMe": {
+      $eq: ["$createdBy._id", new ObjectId(_id)],
+    },
+  });
+
+  let pipelineForCount = getAggrForPagintn(aggr);
+  pipelineForCount.push({ $count: "total" });
+  pipelineForCount.push({
+    $unwind: {
+      path: "$total",
+      preserveNullAndEmptyArrays: true,
+    },
+  });
+
+  aggr.project({
+    password: 0,
+    "createdBy.password": 0,
+  });
+
+  aggr.sort({
+    createdAt: -1,
+  });
+
+  const pipeline = aggr.pipeline();
 
   const users = await User.aggregate(pipeline);
+  const total = await User.aggregate(pipelineForCount);
 
   return c.json({
+    paginate: total[0],
     data: adminId ? users[0] : users,
     message: "All Users",
   });
