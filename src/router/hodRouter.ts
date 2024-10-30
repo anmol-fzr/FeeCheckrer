@@ -5,8 +5,8 @@ import { byRole, jwt } from "../middleware";
 const hodRouter = new Hono();
 
 hodRouter.use(jwt);
-
 hodRouter.use(byRole("superadmin"));
+
 hodRouter
   .get("/", ...getHodHndlr)
   .post(...newHodHndlr)
