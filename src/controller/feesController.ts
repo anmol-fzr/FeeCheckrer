@@ -1,6 +1,10 @@
 import { Factory } from "hono/factory";
 import { Aggregate } from "mongoose";
 import { Fee } from "../model";
+import { getAggrForPagintn } from "../utils";
+import { zValidator } from "@hono/zod-validator";
+import { searchFeeSchema, updateFeeSchema } from "../schema";
+import { paginator } from "../middleware";
 
 const { createHandlers } = new Factory();
 
@@ -33,48 +37,118 @@ const getFeeHndlr = createHandlers(async (c) => {
   const pipeline = aggr.pipeline();
 
   const fee = await Fee.aggregate(pipeline);
+  if (fee.length === 0) {
+    return c.json(
+      {
+        data: null,
+        message: "Fee not Found",
+      },
+      404,
+    );
+  }
 
   return c.json({
     data: fee[0],
   });
 });
 
-const getFeesHndlr = createHandlers(async (c) => {
-  const aggr = new Aggregate();
+const getFeesHndlr = createHandlers(
+  paginator,
+  zValidator("query", searchFeeSchema),
+  async (c) => {
+    const aggr = new Aggregate();
+    console.log(c.req.valid("query"));
+    const { status, sem, feeType } = c.req.valid("query");
 
-  aggr.lookup({
-    localField: "studentId",
-    foreignField: "_id",
-    from: "students",
-    as: "student",
-  });
+    aggr.lookup({
+      localField: "studentId",
+      foreignField: "_id",
+      from: "students",
+      as: "student",
+    });
 
-  aggr.unwind({
-    path: "$student",
-    preserveNullAndEmptyArrays: true,
-  });
+    aggr.unwind({
+      path: "$student",
+      preserveNullAndEmptyArrays: true,
+    });
 
-  aggr.lookup({
-    localField: "student.details",
-    foreignField: "_id",
-    from: "studentdetails",
-    as: "student.details",
-  });
+    aggr.lookup({
+      localField: "student.details",
+      foreignField: "_id",
+      from: "studentdetails",
+      as: "student.details",
+    });
 
-  aggr.unwind({
-    path: "$student.details",
-    preserveNullAndEmptyArrays: true,
-  });
+    aggr.unwind({
+      path: "$student.details",
+      preserveNullAndEmptyArrays: true,
+    });
 
-  const pipeline = aggr.pipeline();
+    if (feeType && feeType.length > 0) {
+      aggr.match({
+        feeType: { $in: feeType },
+      });
+    }
 
-  const fees = await Fee.aggregate(pipeline);
+    if (status && status.length > 0) {
+      aggr.match({
+        status: { $in: status },
+      });
+    }
 
-  c.res.headers.set("Cache-Control", `only-if-cached, public, max-age=420`);
+    if (sem && sem.length > 0) {
+      const semNum = sem.map(Number);
 
-  return c.json({
-    data: fees,
-  });
-});
+      aggr.match({
+        sem: { $in: semNum },
+      });
+    }
 
-export { getFeeHndlr, getFeesHndlr };
+    const pipeline = aggr.pipeline();
+
+    const pipelineForCount = getAggrForPagintn(aggr);
+
+    pipelineForCount.push({ $count: "total" });
+    pipelineForCount.push({
+      $unwind: {
+        path: "$total",
+        preserveNullAndEmptyArrays: true,
+      },
+    });
+
+    const fees = await Fee.aggregate(pipeline);
+    const total = await Fee.aggregate(pipelineForCount);
+
+    return c.json({
+      paginate: total[0],
+      data: fees,
+    });
+  },
+);
+
+const updateFeeHndlr = createHandlers(
+  zValidator("json", updateFeeSchema),
+  async (c) => {
+    const feeId = c.req.param("feeId");
+    const body = c.req.valid("json");
+
+    const fee = await Fee.findByIdAndUpdate(feeId, body, { new: true });
+    if (!fee) {
+      return c.json(
+        {
+          data: null,
+          message: "Fee not Found",
+        },
+        404,
+      );
+    }
+    const updatedFee = fee.save();
+
+    return c.json({
+      data: updatedFee,
+      message: "Fee Updated Successfully",
+    });
+  },
+);
+
+export { getFeeHndlr, getFeesHndlr, updateFeeHndlr };

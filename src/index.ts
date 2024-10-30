@@ -18,8 +18,6 @@ startup();
 const app = new Hono();
 
 app.use(xRespTime);
-app.use(httpCacheControll);
-app.use(etag());
 
 app.use(
   cors({

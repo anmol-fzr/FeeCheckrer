@@ -7,6 +7,7 @@ import { Factory } from "hono/factory";
 import { Aggregate } from "mongoose";
 import { Student } from "../model";
 import { paginator } from "../middleware";
+import { getAggrForPagintn } from "../utils";
 
 const { createHandlers } = new Factory();
 
@@ -18,7 +19,7 @@ const getStudentsHndlr = createHandlers(paginator, async (c) => {
   const batchs = c.req.queries("batch");
   const completions = c.req.queries("completion");
 
-  const { limit, skip, page } = c.get("paginator");
+  const { limit, skip } = c.get("paginator");
 
   const aggr = new Aggregate();
 
@@ -53,7 +54,7 @@ const getStudentsHndlr = createHandlers(paginator, async (c) => {
   }
 
   if (completions && completions?.length === 1) {
-    const forComplete = completions[0] === "complete";
+    const forComplete = completions[0] === "true";
     aggr.match({
       details: {
         [forComplete ? "$ne" : "$eq"]: null,
@@ -90,7 +91,8 @@ const getStudentsHndlr = createHandlers(paginator, async (c) => {
     "details.batch": 0,
   });
 
-  let pipelineForCount = structuredClone(aggr.pipeline());
+  const pipelineForCount = getAggrForPagintn(aggr);
+
   pipelineForCount.push({ $count: "total" });
   pipelineForCount.push({
     $unwind: {

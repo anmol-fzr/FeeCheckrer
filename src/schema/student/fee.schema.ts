@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { sbCollectRegex } from "../../utils";
+import { feeStatuses, feeTypes } from "../../model";
+import { paginationSchema } from "../helper";
 
 const feeAmntSchema = (label: string) =>
   z
@@ -37,4 +39,24 @@ const addFeeSchema = z
     }
   });
 
-export { addFeeSchema };
+const updateFeeSchema = z.object({
+  status: z.enum(feeStatuses),
+});
+
+const sems = Array.from({ length: 8 }, (_, i) => `${i + 1}`);
+
+const queryParamSchema = (arr: any) =>
+  z
+    .union([z.enum(arr), z.array(z.enum(arr))])
+    .transform((val) => (typeof val === "string" ? [val] : val))
+    .optional();
+
+const searchFeeSchema = z
+  .object({
+    feeType: queryParamSchema(feeTypes),
+    status: queryParamSchema(feeStatuses),
+    sem: queryParamSchema(sems),
+  })
+  .and(paginationSchema);
+
+export { addFeeSchema, updateFeeSchema, searchFeeSchema };

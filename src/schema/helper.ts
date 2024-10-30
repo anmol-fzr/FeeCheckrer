@@ -1,5 +1,12 @@
+import { z } from "zod";
+
 const isNumValid = (val: number) => {
   return !Number.isNaN(val);
 };
 
-export { isNumValid };
+const paginationSchema = z.object({
+  page: z.coerce.number().optional(),
+  size: z.coerce.number().optional(),
+});
+
+export { isNumValid, paginationSchema };
