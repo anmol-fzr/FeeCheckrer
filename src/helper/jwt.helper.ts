@@ -19,7 +19,7 @@ const jwtsHelper = {
   },
 
   getStudentToken: async (payload: GetStudentTokenData) => {
-    const token = await sign(payload, envs.JWT_SECRET);
+    const token = await sign({ ...payload, role: "student" }, envs.JWT_SECRET);
     return token;
   },
 };

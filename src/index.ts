@@ -18,6 +18,7 @@ startup();
 const app = new Hono();
 
 app.use(xRespTime);
+app.use(etag());
 
 app.use(
   cors({
@@ -35,9 +36,11 @@ app
   .route("/auth", authRouter)
   .route("/hod", hodRouter)
   .route("/clerk", clerkRouter)
-  .route("/student", studentRouter)
   .route("/students", studentsRouter)
   .route("/fees", feesRouter);
+
+app.use(httpCacheControll);
+app.route("/student", studentRouter);
 
 //app.get("/meta", ...getMetaHndlr);
 
