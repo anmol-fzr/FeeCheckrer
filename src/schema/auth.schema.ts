@@ -7,4 +7,6 @@ const loginSchema = z.object({
 
 const signUpSchema = loginSchema;
 
-export { loginSchema, signUpSchema };
+const updateAccountSchema = loginSchema.pick({ password: true });
+
+export { loginSchema, signUpSchema, updateAccountSchema };

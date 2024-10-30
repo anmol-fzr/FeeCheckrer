@@ -1,8 +1,10 @@
 import { createFactory } from "hono/factory";
-import { loginSchema } from "../schema";
+import { loginSchema, updateAccountSchema } from "../schema";
 import { zValidator } from "@hono/zod-validator";
 import { User } from "../model";
 import { jwtsHelper } from "../helper/jwt.helper";
+import { passHelper } from "../helper";
+import { jwt } from "../middleware";
 
 const { createHandlers } = createFactory();
 
@@ -50,6 +52,7 @@ const loginHndlr = createHandlers(
       data: {
         name,
         role,
+        email,
         token,
       },
       message: "Logged in Successfully",
@@ -57,4 +60,34 @@ const loginHndlr = createHandlers(
   },
 );
 
-export { loginHndlr };
+const updateAccountHndlr = createHandlers(
+  jwt,
+  zValidator("json", updateAccountSchema),
+  async (c) => {
+    const { _id: userId } = c.get("jwtPayload");
+    const { password: rawPass } = c.req.valid("json");
+
+    const password = await passHelper.getHashedPassword(rawPass);
+
+    const foundUser = await User.findByIdAndUpdate(
+      userId,
+      { password },
+      { new: true },
+    );
+
+    if (!foundUser) {
+      return c.json(
+        {
+          message: "Unauthorized",
+        },
+        401,
+      );
+    }
+
+    await foundUser.save();
+
+    return c.json({ data: null, message: "Account Updated Successfully" });
+  },
+);
+
+export { loginHndlr, updateAccountHndlr };
