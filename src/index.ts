@@ -9,6 +9,7 @@ import {
   studentRouter,
   studentsRouter,
   feesRouter,
+  appRouter,
 } from "./router";
 import { logger } from "hono/logger";
 import { xRespTime, httpCacheControll } from "./middleware";
@@ -31,6 +32,8 @@ app.use(logger());
 app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
+
+app.route("/app", appRouter);
 
 app
   .route("/auth", authRouter)

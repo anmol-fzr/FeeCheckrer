@@ -18,6 +18,15 @@ const envSchema = z.object({
 
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_TEMP_SECRET: z.string().min(1, "JWT_TEMP_SECRET is required"),
+
+  FIREBASE_API_KEY: z.string(),
+  FIREBASE_AUTH_DOMAIN: z.string(),
+  FIREBASE_DB_URL: z.string(),
+  FIREBASE_PROJECT_ID: z.string(),
+  FIREBASE_STORAGE_BUCKET: z.string(),
+  FIREBASE_MESSAGING_SENDER_ID: z.string(),
+  FIREBASE_APP_ID: z.string(),
+  FIREBASE_MEASUREMENT_ID: z.string(),
 });
 
 export { envSchema };

@@ -5,8 +5,7 @@ const rawEnv = process.env;
 
 envSchema
   .parseAsync(rawEnv)
-  .then((res) => {
-    console.log(res);
+  .then(() => {
     process.exit(0);
   })
   .catch((err) => {
