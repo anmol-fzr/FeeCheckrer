@@ -2,103 +2,99 @@ import { createFactory } from "hono/factory";
 import { zValidator } from "@hono/zod-validator";
 import { loginSchema, registerSchema } from "../../schema";
 import { Student } from "../../model";
-import { passHelper, jwtsHelper } from "../../helper";
+import { jwtsHelper, unauth } from "../../helper";
+import { publishOnMailQueue } from "../../helper/mail.helper";
+import { getRand } from "../../utils";
+import { redisClient } from "../../config/redis.config";
+import { jwt } from "../../middleware";
+import { capitalCase } from "change-case";
 
 const { createHandlers } = createFactory();
 
 const loginStuHndlr = createHandlers(
   zValidator("json", loginSchema),
   async (c) => {
-    const { email, password: rawPass } = c.req.valid("json");
+    const { email, otp } = c.req.valid("json");
 
-    const foundStudent = await Student.findOne({ email })
-      .populate("details", "-_id -createdAt -updatedAt")
-      .select("-createdAt -updatedAt")
-      .lean();
+    if (!otp) {
+      const newOtp = getRand(100001, 999999);
 
-    if (!foundStudent) {
-      return c.json(
-        {
-          message: "User with this email doesn't exist.",
-        },
-        404,
-      );
+      redisClient.setex(email, 600, newOtp);
+
+      publishOnMailQueue({
+        type: "login-otp",
+        email,
+        otp: newOtp,
+      });
+
+      return c.json({
+        message: `An OTP been sent on your email ${email}`,
+      });
     }
 
-    if (!foundStudent.isVerified) {
+    const savedOtp = await redisClient.getex(email);
+
+    if (otp !== Number(savedOtp)) {
       return c.json(
         {
-          message: "User isn't verified yet.",
-        },
-        404,
-      );
-    }
-
-    const isPassOk = await passHelper.verifyPassword(
-      rawPass,
-      foundStudent.password,
-    );
-
-    if (!isPassOk) {
-      return c.json(
-        {
-          message: "Incorrect Password.",
+          message: `Incorrect OTP`,
         },
         400,
       );
     }
 
-    const token = await jwtsHelper.getStudentToken({
-      studentId: foundStudent._id.toString(),
-    });
+    const foundUser = await Student.findOne({ email }).select("_id").lean();
+    const isNewUser = foundUser === null;
 
-    delete foundStudent.password;
-    const isProfileComplete = foundStudent.details !== null;
+    let loginToken = "";
+
+    if (isNewUser) {
+      loginToken = await jwtsHelper.student.getLoginToken({ email });
+    } else {
+      loginToken = await jwtsHelper.student.getFullToken({
+        studentId: foundUser?._id.toString(),
+      });
+    }
 
     return c.json({
       data: {
-        isProfileComplete,
-        ...foundStudent,
-        token,
+        isNewUser,
+        token: loginToken,
       },
-      message: "Logged in Successfully",
+      message: `Login Successfully`,
     });
   },
 );
 
 const registerStuHndlr = createHandlers(
+  jwt,
   zValidator("json", registerSchema),
   async (c) => {
-    const { email, password: rawPass,avatar } = c.req.valid("json");
+    const { email: jwtEmail } = c.get("jwtPayload");
+    const details = c.req.valid("json");
 
-    const password = await passHelper.getHashedPassword(rawPass);
+    if (jwtEmail !== details.email) {
+      return unauth(c);
+    }
 
-    const newStudent = new Student({
-      email,
-      avatar,
-      password,
-      isVerified: false,
-    });
+    const newStudent = new Student(details);
 
     try {
       const savedStudent = await newStudent.save();
-      const token = await jwtsHelper.getStudentToken({
+
+      const token = await jwtsHelper.student.getFullToken({
         studentId: savedStudent._id.toString(),
       });
 
-      savedStudent.password = "";
       return c.json({
         data: { token },
         message: "Registered Successfully",
       });
     } catch (err: any) {
       if (err.code === 11000) {
-        const duplicateField = Object.keys(err.keyPattern)[0];
+        const path = Object.keys(err.keyPattern)[0];
 
-        let message = "Duplicate field error.";
-        if (duplicateField === "email") {
-          message = "A user with this Email Address already exists.";
-        }
+        const message = `A user with this ${capitalCase(path)} already exists.`;
 
         return c.json(
           {
@@ -109,10 +105,12 @@ const registerStuHndlr = createHandlers(
         );
       }
 
+      const error = "Something went wrong while Registering New User.";
+
       return c.json(
         {
-          error: "Something went wrong while creating the clerk.",
-          message: "Something went wrong while creating the clerk.",
+          error,
+          message: error,
         },
         500,
       );

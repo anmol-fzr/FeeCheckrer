@@ -30,6 +30,7 @@ const addFeeHndlr = createHandlers(
 );
 
 const getMyFeesHndlr = createHandlers(jwt, async (c) => {
+  const feeId = c.req.param("feeId");
   const { studentId } = c.get("jwtPayload");
 
   const aggr = new Aggregate();
@@ -37,6 +38,12 @@ const getMyFeesHndlr = createHandlers(jwt, async (c) => {
   aggr.match({
     studentId: new ObjectId(studentId),
   });
+
+  if (feeId) {
+    aggr.match({
+      _id: new ObjectId(feeId),
+    });
+  }
 
   aggr.project({
     studentId: 0,
@@ -51,8 +58,8 @@ const getMyFeesHndlr = createHandlers(jwt, async (c) => {
   const myFees = await Fee.aggregate(pipeline);
 
   return c.json({
-    data: myFees,
-    message: "Fee Data Submitted Successfully",
+    data: feeId ? myFees[0] : myFees,
+    message: "My Fees Data",
   });
 });
 

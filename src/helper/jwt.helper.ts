@@ -8,7 +8,11 @@ type GetLoginTokenData = {
   role: Role;
 };
 
-type GetStudentTokenData = {
+type GetStudentLoginTokenData = {
+  email: string;
+};
+
+type GetStudentFullTokenData = {
   studentId: string;
 };
 
@@ -18,9 +22,22 @@ const jwtsHelper = {
     return token;
   },
 
-  getStudentToken: async (payload: GetStudentTokenData) => {
-    const token = await sign({ ...payload, role: "student" }, envs.JWT_SECRET);
-    return token;
+  student: {
+    getLoginToken: async (payload: GetStudentLoginTokenData) => {
+      const token = await sign(
+        { ...payload, role: "student" },
+        envs.JWT_SECRET,
+      );
+      return token;
+    },
+
+    getFullToken: async (payload: GetStudentFullTokenData) => {
+      const token = await sign(
+        { ...payload, role: "student" },
+        envs.JWT_SECRET,
+      );
+      return token;
+    },
   },
 };
 

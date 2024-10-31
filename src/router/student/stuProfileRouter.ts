@@ -1,15 +1,8 @@
 import { Hono } from "hono";
-import {
-  getProfileHndlr,
-  newProfileHndlr,
-  updateProfileHndlr,
-} from "../../controller";
+import { getProfileHndlr, updateProfileHndlr } from "../../controller";
 
 const stuProfileRouter = new Hono();
 
-stuProfileRouter
-  .get("/", ...getProfileHndlr)
-  .post(...newProfileHndlr)
-  .patch(...updateProfileHndlr);
+stuProfileRouter.get("/", ...getProfileHndlr).patch(...updateProfileHndlr);
 
 export { stuProfileRouter };

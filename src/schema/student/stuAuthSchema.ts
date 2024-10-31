@@ -4,6 +4,7 @@ import {
   atLeastOneNum,
   atLeastOneUpperCase,
 } from "../../utils";
+import { stuNewProfileSchema } from "./stuProfileSchema";
 
 const passwordSchema = z
   .string()
@@ -28,12 +29,12 @@ const stuLoginSchema = z.object({
   password: passwordSchema,
 });
 
-const registerSchema = z.object({
-  email: z.string().email(),
-  password: passwordSchema,
-  avatar: z.string().optional(),
-  //confirmPassword: passwordSchema,
-});
+const registerSchema = z
+  .object({
+    email: z.string().email(),
+    avatar: z.string().optional(),
+  })
+  .and(stuNewProfileSchema);
 //.refine((values) => values.password === values.confirmPassword, {
 //  message: "Passwords must match!",
 //  path: ["confirmPassword"],

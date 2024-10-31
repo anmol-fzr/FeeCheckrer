@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.4.1",
+    "amqp-ts": "^1.8.0",
     "change-case": "^5.4.4",
     "crypto": "^1.0.1",
     "hono": "^4.6.5",

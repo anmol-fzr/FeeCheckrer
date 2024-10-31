@@ -11,14 +11,14 @@ const stuNewProfileSchema = z.object({
     .refine(isNumValid, { message: "Invalid Mobile Number" }),
   admissionNo: z
     .string()
-    .min(4)
+    .min(8)
     .max(8)
     .transform(Number)
     .refine(isNumValid, { message: "Invalid Admission Number" }),
   rollNo: z
     .string()
-    .min(4)
-    .max(8)
+    .min(6)
+    .max(6)
     .transform(Number)
     .refine(isNumValid, { message: "Invalid Roll Number" }),
   batch: z
