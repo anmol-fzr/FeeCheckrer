@@ -1,6 +1,7 @@
 import * as Amqp from "amqp-ts";
+import { envs } from "../utils";
 
-const queueClient = new Amqp.Connection("amqp://rabbitmq");
+const queueClient = new Amqp.Connection(envs.AMQP_URI);
 
 queueClient.on("open_connection", () => {
   console.log("Connection to Rabbit MQ Opened");

@@ -10,6 +10,7 @@ services:
   #     - 5174:5174
   #   networks:
   #     - feecheckr
+  #   env_file: "./FeeGiver/.env"
   #   volumes:
   #     - ./FeeGiver:/app
   #   depends_on:
@@ -20,9 +21,7 @@ services:
   #   build: "./FeeCheckr"
   #   ports:
   #     - 5173:5173
-  #   environment:
-  #     - VITE_APP_SERVER_URL=http://FeeCheckrer:3000/
-  #     - SERVER_URL=http://FeeCheckrer:3000/
+  #   env_file: "./FeeCheckr/.env"
   #   networks:
   #     - feecheckr
   #   volumes:
@@ -58,10 +57,25 @@ services:
     ports:
       - "3000:3000"
     environment:
+      AMQP_URI: amqp://rabbit:QAmTZ0LufU@rabbitmq
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
       MONGO_URI: mongodb://root:password@mongodb:27017/dev?authSource=admin
       JWT_SECRET: "astaghfirullah"
       JWT_TEMP_SECRET: "astaghfirullah2"
       PORT: 3000
+
+      FIREBASE_API_KEY: AIzaSyATBThrcStzkwVCTu_js9tfDI-QtEcZA4A
+      FIREBASE_AUTH_DOMAIN: genz-feats.firebaseapp.com
+      FIREBASE_DB_URL: https://genz-feats-default-rtdb.asia-southeast1.firebasedatabase.app
+      FIREBASE_PROJECT_ID: genz-feats
+      FIREBASE_STORAGE_BUCKET: genz-feats.appspot.com
+      FIREBASE_MESSAGING_SENDER_ID: 258868436534
+      FIREBASE_APP_ID: 1:258868436534:web:42d47c92d2cab9730e0297
+      FIREBASE_MEASUREMENT_ID: G-HR6B46QBCF
+
     networks:
       - feecheckr
     volumes:
@@ -69,6 +83,38 @@ services:
     depends_on:
       - mongodb
 
+  rabbitmq:
+    image: rabbitmq:4-alpine
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment: 
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: QAmTZ0LufU 
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - feecheckr
+
+  mailer:
+    build: "./mailer"
+    container_name: mailer
+    ports: 
+      - "6546:6546"
+    environment:
+      GMAIL_ADDR: ainsa2279@gmail.com
+      GMAIL_PASS: iqmeutnalmajjkvz
+      AMQP_URI: amqp://rabbit:QAmTZ0LufU@rabbitmq
+    volumes:
+      - ./mailer:/app
+    depends_on:
+      - rabbitmq
+    networks:
+      - feecheckr
+
 volumes:
   mongo-data:
+    driver: local
+  rabbitmq-data: 
     driver: local

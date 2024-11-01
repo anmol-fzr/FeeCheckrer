@@ -1,8 +1,9 @@
 import { Redis } from "ioredis";
+import { envs } from "../utils";
 
 const redis = new Redis({
-  host: "redis",
-  port: 6379,
+  host: envs.REDIS.HOST,
+  port: envs.REDIS.PORT,
 });
 
 const connectRedis = () => {
