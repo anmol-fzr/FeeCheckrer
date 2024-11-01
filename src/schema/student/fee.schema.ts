@@ -41,6 +41,7 @@ const addFeeSchema = z
 
 const updateFeeSchema = z.object({
   status: z.enum(feeStatuses),
+  rejection: z.string().optional()
 });
 
 const sems = Array.from({ length: 8 }, (_, i) => `${i + 1}`);

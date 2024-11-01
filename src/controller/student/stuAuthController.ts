@@ -1,6 +1,6 @@
 import { createFactory } from "hono/factory";
 import { zValidator } from "@hono/zod-validator";
-import { loginSchema, registerSchema } from "../../schema";
+import { stuLoginSchema, registerSchema } from "../../schema";
 import { Student } from "../../model";
 import { jwtsHelper, unauth } from "../../helper";
 import { publishOnMailQueue } from "../../helper/mail.helper";
@@ -12,7 +12,7 @@ import { capitalCase } from "change-case";
 const { createHandlers } = createFactory();
 
 const loginStuHndlr = createHandlers(
-  zValidator("json", loginSchema),
+  zValidator("json", stuLoginSchema),
   async (c) => {
     const { email, otp } = c.req.valid("json");
 

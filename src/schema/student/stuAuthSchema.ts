@@ -26,7 +26,7 @@ const passwordSchema = z
 
 const stuLoginSchema = z.object({
   email: z.string().email(),
-  password: passwordSchema,
+  otp: z.coerce.number().optional().nullable(),
 });
 
 const registerSchema = z

@@ -23,18 +23,6 @@ const getStudentsHndlr = createHandlers(paginator, async (c) => {
 
   const aggr = new Aggregate();
 
-  aggr.lookup({
-    localField: "details",
-    foreignField: "_id",
-    from: "studentdetails",
-    as: "details",
-  });
-
-  aggr.unwind({
-    path: "$details",
-    preserveNullAndEmptyArrays: true,
-  });
-
   if (id) {
     aggr.match({
       $expr: {
@@ -64,7 +52,7 @@ const getStudentsHndlr = createHandlers(paginator, async (c) => {
 
   if (name) {
     aggr.match({
-      "details.name": { $regex: name, $options: "i" },
+      name: { $regex: name, $options: "i" },
     });
   }
   if (email) {
@@ -80,16 +68,6 @@ const getStudentsHndlr = createHandlers(paginator, async (c) => {
       "details.batch": { $in: numBatch },
     });
   }
-
-  aggr.addFields({
-    name: "$details.name",
-    batch: "$details.batch",
-  });
-
-  aggr.project({
-    "details.name": 0,
-    "details.batch": 0,
-  });
 
   const pipelineForCount = getAggrForPagintn(aggr);
 

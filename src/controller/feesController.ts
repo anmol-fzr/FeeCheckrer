@@ -57,7 +57,6 @@ const getFeesHndlr = createHandlers(
   zValidator("query", searchFeeSchema),
   async (c) => {
     const aggr = new Aggregate();
-    console.log(c.req.valid("query"));
     const { status, sem, feeType } = c.req.valid("query");
 
     aggr.lookup({
@@ -69,18 +68,6 @@ const getFeesHndlr = createHandlers(
 
     aggr.unwind({
       path: "$student",
-      preserveNullAndEmptyArrays: true,
-    });
-
-    aggr.lookup({
-      localField: "student.details",
-      foreignField: "_id",
-      from: "studentdetails",
-      as: "student.details",
-    });
-
-    aggr.unwind({
-      path: "$student.details",
       preserveNullAndEmptyArrays: true,
     });
 
