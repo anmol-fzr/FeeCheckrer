@@ -42,9 +42,7 @@ services:
     container_name: mongodb
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
+    env_file: ".mongo.env"
     networks:
       - feecheckr
     volumes:
@@ -56,32 +54,24 @@ services:
     container_name: server
     ports:
       - "3000:3000"
-    environment:
-      AMQP_URI: amqp://rabbit:QAmTZ0LufU@rabbitmq
-
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-
-      MONGO_URI: mongodb://root:password@mongodb:27017/dev?authSource=admin
-      JWT_SECRET: "astaghfirullah"
-      JWT_TEMP_SECRET: "astaghfirullah2"
-      PORT: 3000
-
-      FIREBASE_API_KEY: AIzaSyATBThrcStzkwVCTu_js9tfDI-QtEcZA4A
-      FIREBASE_AUTH_DOMAIN: genz-feats.firebaseapp.com
-      FIREBASE_DB_URL: https://genz-feats-default-rtdb.asia-southeast1.firebasedatabase.app
-      FIREBASE_PROJECT_ID: genz-feats
-      FIREBASE_STORAGE_BUCKET: genz-feats.appspot.com
-      FIREBASE_MESSAGING_SENDER_ID: 258868436534
-      FIREBASE_APP_ID: 1:258868436534:web:42d47c92d2cab9730e0297
-      FIREBASE_MEASUREMENT_ID: G-HR6B46QBCF
-
+    env_file: ".feecheckrer.env"
     networks:
       - feecheckr
     volumes:
       - ./FeeCheckrer:/app
     depends_on:
       - mongodb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"] 
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
 
   rabbitmq:
     image: rabbitmq:4-alpine
@@ -89,9 +79,7 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
-    environment: 
-      RABBITMQ_DEFAULT_USER: rabbit
-      RABBITMQ_DEFAULT_PASS: QAmTZ0LufU 
+    env_file: ".rabbitmq.env"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
@@ -102,16 +90,24 @@ services:
     container_name: mailer
     ports: 
       - "6546:6546"
-    environment:
-      GMAIL_ADDR: ainsa2279@gmail.com
-      GMAIL_PASS: iqmeutnalmajjkvz
-      AMQP_URI: amqp://rabbit:QAmTZ0LufU@rabbitmq
+    env_file: ".mailer.env"
     volumes:
       - ./mailer:/app
     depends_on:
       - rabbitmq
     networks:
       - feecheckr
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6546"] 
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
 
 volumes:
   mongo-data:
