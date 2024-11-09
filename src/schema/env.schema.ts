@@ -28,6 +28,11 @@ const envSchema = z.object({
 
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_TEMP_SECRET: z.string().min(1, "JWT_TEMP_SECRET is required"),
+
+  MINIO_HOST: z.string(),
+  MINIO_PORT: portSchema("MINIO_PORT"),
+  MINIO_ACCESS_KEY: z.string(),
+  MINIO_SECRET_KEY: z.string(),
 });
 
 export { envSchema };
