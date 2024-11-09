@@ -1,12 +1,14 @@
 import {} from "zod";
-import { envSchema } from "./schema";
+import { envSchema } from "../schema";
+import { genTypeFile } from "./gen-types";
 
 const rawEnv = process.env;
 
 envSchema
   .parseAsync(rawEnv)
-  .then((res) => {
-    console.log(res);
+  .then(() => {
+    console.log("Envs Validated Successfully");
+    genTypeFile();
     process.exit(0);
   })
   .catch((err) => {
