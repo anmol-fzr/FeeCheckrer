@@ -4,13 +4,12 @@ import { feeStatuses, feeTypes } from "../../model";
 import { paginationSchema } from "../helper";
 
 const feeAmntSchema = (label: string) =>
-  z
+  z.coerce
     .number({
       invalid_type_error: `${label} must be a number`,
     })
     .safe()
     .max(999999);
-
 const boolSchema = (label: string) =>
   z.enum(["true", "false"], {
     errorMap: () => ({ message: `${label} is Required` }),
@@ -41,7 +40,7 @@ const addFeeSchema = z
 
 const updateFeeSchema = z.object({
   status: z.enum(feeStatuses),
-  rejection: z.string().optional()
+  rejection: z.string().optional(),
 });
 
 const sems = Array.from({ length: 8 }, (_, i) => `${i + 1}`);

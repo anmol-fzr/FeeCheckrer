@@ -1,9 +1,11 @@
 import { zValidator } from "@hono/zod-validator";
 import { Factory } from "hono/factory";
-import { addFeeSchema } from "../../schema";
-import { jwt } from "../../middleware";
-import { Fee } from "../../model";
 import mongoose, { Aggregate } from "mongoose";
+
+import { addFeeSchema } from "@/schema";
+import { jwt } from "@/middleware";
+import { Fee } from "@/model";
+import { uploadFeeReceipt } from "@/helper";
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -11,16 +13,27 @@ const { createHandlers } = new Factory();
 
 const addFeeHndlr = createHandlers(
   jwt,
-  zValidator("json", addFeeSchema),
+  zValidator("form", addFeeSchema),
   async (c) => {
     const { studentId } = c.get("jwtPayload");
-    const body = c.req.valid("json");
+    const body = await c.req.parseBody();
+    const formData = await c.req.formData();
+
+    const file = formData.get("pdf") as File;
 
     const fee = new Fee({
       ...body,
       studentId,
     });
     const savedFee = await fee.save();
+
+    const feeId = savedFee._id.toString();
+
+    await uploadFeeReceipt({
+      studentId,
+      feeId,
+      file,
+    });
 
     return c.json({
       data: savedFee,
