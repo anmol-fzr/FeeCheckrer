@@ -3,6 +3,9 @@
     "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "outDir": "./dist/"
+    "outDir": "./dist/",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 }
