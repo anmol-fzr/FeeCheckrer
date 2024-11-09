@@ -32,6 +32,10 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
+app.get("/health", (c) => {
+  return c.text("Hello Hono!");
+});
+
 app
   .route("/auth", authRouter)
   .route("/hod", hodRouter)
