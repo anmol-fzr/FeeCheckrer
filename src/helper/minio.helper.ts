@@ -1,17 +1,28 @@
-import { minioClient } from "../config";
+import { envs } from "@/utils";
+import { baseMinioPath, minioClient } from "../config";
 
-type UploadFeeReceipt = {
+type GetFeeReceiptPath = {
   studentId: string;
   feeId: string;
+};
+
+type GetFeeReceiptUri = GetFeeReceiptPath;
+type UploadFeeReceipt = GetFeeReceiptPath & {
   file: File;
 };
+
+function getFeeReceiptPath({ studentId, feeId }: GetFeeReceiptPath) {
+  return `${studentId}/${feeId}`;
+}
 
 async function uploadFeeReceipt({ studentId, feeId, file }: UploadFeeReceipt) {
   const arr = await file.arrayBuffer();
 
+  const path = getFeeReceiptPath({ studentId, feeId });
+
   const res = await minioClient.putObject(
     `students`,
-    `${studentId}/${feeId}`,
+    path,
     Buffer.from(arr),
     undefined,
     {
@@ -22,4 +33,20 @@ async function uploadFeeReceipt({ studentId, feeId, file }: UploadFeeReceipt) {
   return res;
 }
 
-export { uploadFeeReceipt };
+async function getFeeReceiptUri({ studentId, feeId }: GetFeeReceiptUri) {
+  const path = getFeeReceiptPath({ studentId, feeId });
+
+  const presignedUrl = await minioClient.presignedUrl("GET", "students", path);
+  const pdfUri = resolveMinioHost(presignedUrl);
+
+  const url = new URL(pdfUri);
+  const newUrl = url.origin + url.pathname;
+
+  return newUrl;
+}
+
+export { uploadFeeReceipt, getFeeReceiptUri };
+
+function resolveMinioHost(uri: string) {
+  return uri.replace(envs.MINIO.HOST, envs.MINIO.IP);
+}

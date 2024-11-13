@@ -5,7 +5,7 @@ import mongoose, { Aggregate } from "mongoose";
 import { addFeeSchema } from "@/schema";
 import { jwt } from "@/middleware";
 import { Fee } from "@/model";
-import { uploadFeeReceipt } from "@/helper";
+import { getFeeReceiptUri, uploadFeeReceipt } from "@/helper";
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -16,7 +16,8 @@ const addFeeHndlr = createHandlers(
   zValidator("form", addFeeSchema),
   async (c) => {
     const { studentId } = c.get("jwtPayload");
-    const body = await c.req.parseBody();
+    const body = c.req.valid("form");
+
     const formData = await c.req.formData();
 
     const file = formData.get("pdf") as File;
@@ -25,6 +26,7 @@ const addFeeHndlr = createHandlers(
       ...body,
       studentId,
     });
+
     const savedFee = await fee.save();
 
     const feeId = savedFee._id.toString();

@@ -7,6 +7,7 @@ import { passHelper } from "../helper";
 import { jwt } from "../middleware";
 
 const { createHandlers } = createFactory();
+const { getLoginToken } = jwtsHelper.user;
 
 const loginHndlr = createHandlers(
   zValidator("json", loginSchema),
@@ -42,7 +43,7 @@ const loginHndlr = createHandlers(
 
     const { _id, name, role } = foundUser;
 
-    const token = await jwtsHelper.getLoginToken({
+    const token = await getLoginToken({
       _id: _id.toString(),
       name,
       role,

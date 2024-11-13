@@ -1,10 +1,12 @@
 import { Factory } from "hono/factory";
 import { Aggregate } from "mongoose";
 import { Fee } from "../model";
-import { getAggrForPagintn } from "../utils";
+import { envs, getAggrForPagintn } from "../utils";
 import { zValidator } from "@hono/zod-validator";
 import { searchFeeSchema, updateFeeSchema } from "../schema";
 import { paginator } from "../middleware";
+import { baseMinioPath, minioClient } from "@/config";
+import { getFeeReceiptUri } from "@/helper";
 
 const { createHandlers } = new Factory();
 
@@ -47,8 +49,15 @@ const getFeeHndlr = createHandlers(async (c) => {
     );
   }
 
+  const studentId = fee[0].studentId.toString();
+
+  const pdfUri = await getFeeReceiptUri({ studentId, feeId });
+
   return c.json({
-    data: fee[0],
+    data: {
+      pdfUri,
+      ...fee[0],
+    },
   });
 });
 
@@ -90,6 +99,10 @@ const getFeesHndlr = createHandlers(
         sem: { $in: semNum },
       });
     }
+
+    aggr.sort({
+      createdAt: -1,
+    });
 
     const pipeline = aggr.pipeline();
 

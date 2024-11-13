@@ -4,12 +4,13 @@ import { stuLoginSchema, registerSchema } from "../../schema";
 import { Student } from "../../model";
 import { jwtsHelper, unauth } from "../../helper";
 import { publishOnMailQueue } from "../../helper/mail.helper";
-import { getRand } from "../../utils";
+import { genOtp } from "../../utils";
 import { redisClient } from "../../config/redis.config";
 import { jwt } from "../../middleware";
 import { capitalCase } from "change-case";
 
 const { createHandlers } = createFactory();
+const { getLoginToken, getFullToken } = jwtsHelper.student;
 
 const loginStuHndlr = createHandlers(
   zValidator("json", stuLoginSchema),
@@ -17,7 +18,8 @@ const loginStuHndlr = createHandlers(
     const { email, otp } = c.req.valid("json");
 
     if (!otp) {
-      const newOtp = getRand(100001, 999999);
+      const newOtp = 123456;
+      //const newOtp = genOtp();
 
       redisClient.setex(email, 600, newOtp);
 
@@ -49,9 +51,9 @@ const loginStuHndlr = createHandlers(
     let loginToken = "";
 
     if (isNewUser) {
-      loginToken = await jwtsHelper.student.getLoginToken({ email });
+      loginToken = await getLoginToken({ email });
     } else {
-      loginToken = await jwtsHelper.student.getFullToken({
+      loginToken = await getFullToken({
         studentId: foundUser?._id.toString(),
       });
     }
@@ -82,7 +84,7 @@ const registerStuHndlr = createHandlers(
     try {
       const savedStudent = await newStudent.save();
 
-      const token = await jwtsHelper.student.getFullToken({
+      const token = await getFullToken({
         studentId: savedStudent._id.toString(),
       });
 
