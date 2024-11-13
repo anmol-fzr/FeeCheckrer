@@ -72,8 +72,22 @@ const getMyFeesHndlr = createHandlers(jwt, async (c) => {
 
   const myFees = await Fee.aggregate(pipeline);
 
+  if (feeId) {
+    const pdfUri = await getFeeReceiptUri({ studentId, feeId });
+
+    const data = {
+      ...myFees[0],
+      pdfUri,
+    };
+
+    return c.json({
+      data,
+      message: "My Fees Data",
+    });
+  }
+
   return c.json({
-    data: feeId ? myFees[0] : myFees,
+    data: myFees,
     message: "My Fees Data",
   });
 });
