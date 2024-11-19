@@ -29,13 +29,7 @@ app.use(
 app.use(requestId());
 app.use(logger);
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
-
-app.get("/health", (c) => {
-  return c.text("Hello Hono!");
-});
+app.on("GET", ["/", "/health"], (c) => c.text("Hello FeeCheckrer!"));
 
 app
   .route("/auth", authRouter)

@@ -18,6 +18,8 @@ const portSchema = (label: string) =>
  * */
 
 const envSchema = z.object({
+  MODE: z.enum(["DEV", "PROD"]).default("DEV"),
+
   MONGO_URI: z.string().url(),
 
   REDIS_HOST: z.string(),

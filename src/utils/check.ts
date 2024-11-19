@@ -1,4 +1,3 @@
-import {} from "zod";
 import { envSchema } from "../schema";
 import { genTypeFile } from "./gen-types";
 

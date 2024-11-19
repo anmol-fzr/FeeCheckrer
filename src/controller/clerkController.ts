@@ -1,9 +1,11 @@
 import { createFactory } from "hono/factory";
-import { newUserSchema, updateUserSchema } from "../schema";
+import { newUserSchema, updateUserSchema } from "@/schema";
 import { zValidator } from "@hono/zod-validator";
-import { User } from "../model";
+import { User } from "@/model";
 import mongoose, { Aggregate } from "mongoose";
-import { paginator } from "../middleware";
+import { paginator } from "@/middleware";
+import { badReq, serverError } from "@/helper";
+import { serve } from "bun";
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -48,22 +50,11 @@ const newClerkHndlr = createHandlers(
           message = "A user with this Email Address already exists.";
         }
 
-        return c.json(
-          {
-            error: message,
-            message,
-          },
-          400,
-        );
+        return badReq(c, message, message);
       }
 
-      return c.json(
-        {
-          error: "Something went wrong while creating the clerk.",
-          message: "Something went wrong while creating the clerk.",
-        },
-        500,
-      );
+      const message = "Something went wrong while creating the clerk.";
+      return serverError(c, message, err);
     }
   },
 );

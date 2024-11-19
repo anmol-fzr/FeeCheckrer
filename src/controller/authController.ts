@@ -1,10 +1,9 @@
 import { createFactory } from "hono/factory";
-import { loginSchema, updateAccountSchema } from "../schema";
+import { loginSchema, updateAccountSchema } from "@/schema";
 import { zValidator } from "@hono/zod-validator";
-import { User } from "../model";
-import { jwtsHelper } from "../helper/jwt.helper";
-import { passHelper } from "../helper";
-import { jwt } from "../middleware";
+import { User } from "@/model";
+import { badReq, notFound, passHelper, unauth, jwtsHelper } from "@/helper";
+import { jwt } from "@/middleware";
 
 const { createHandlers } = createFactory();
 const { getLoginToken } = jwtsHelper.user;
@@ -19,12 +18,7 @@ const loginHndlr = createHandlers(
       .lean();
 
     if (!foundUser) {
-      return c.json(
-        {
-          message: "User doesn't Exists",
-        },
-        400,
-      );
+      return notFound(c, "User doesn't Exists");
     }
 
     const passwordMatched = await Bun.password.verify(
@@ -33,12 +27,7 @@ const loginHndlr = createHandlers(
     );
 
     if (!passwordMatched) {
-      return c.json(
-        {
-          message: "Incorrect Password",
-        },
-        400,
-      );
+      return badReq(c, "Incorrect Password");
     }
 
     const { _id, name, role } = foundUser;
@@ -77,12 +66,7 @@ const updateAccountHndlr = createHandlers(
     );
 
     if (!foundUser) {
-      return c.json(
-        {
-          message: "Unauthorized",
-        },
-        401,
-      );
+      return unauth(c);
     }
 
     await foundUser.save();

@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { sbCollectRegex } from "../../utils";
-import { feeStatuses, feeTypes } from "../../model";
-import { paginationSchema } from "../helper";
+import { sbCollectRegex } from "@/utils";
+import { feeStatuses, feeTypes } from "@/model";
+import { paginationSchema } from "@/schema/helper";
 
 const feeAmntSchema = (label: string) =>
   z.coerce
@@ -10,10 +10,6 @@ const feeAmntSchema = (label: string) =>
     })
     .safe()
     .max(999999);
-const boolSchema = (label: string) =>
-  z.enum(["true", "false"], {
-    errorMap: () => ({ message: `${label} is Required` }),
-  });
 
 const addFeeSchema = z
   .object({

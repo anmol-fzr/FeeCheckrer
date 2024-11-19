@@ -4,7 +4,7 @@ import { stuLoginSchema, registerSchema } from "../../schema";
 import { Student } from "../../model";
 import { jwtsHelper, unauth } from "../../helper";
 import { publishOnMailQueue } from "../../helper/mail.helper";
-import { genOtp } from "../../utils";
+import { envs, genOtp } from "../../utils";
 import { redisClient } from "../../config/redis.config";
 import { jwt } from "../../middleware";
 import { capitalCase } from "change-case";
@@ -18,8 +18,7 @@ const loginStuHndlr = createHandlers(
     const { email, otp } = c.req.valid("json");
 
     if (!otp) {
-      const newOtp = 123456;
-      //const newOtp = genOtp();
+      const newOtp = envs.isDev ? 123456 : genOtp();
 
       redisClient.setex(email, 600, newOtp);
 

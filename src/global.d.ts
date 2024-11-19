@@ -1,6 +1,6 @@
-
-  declare module "bun" {
+declare module "bun" {
     interface Env {
+    MODE?: "DEV" | "PROD";
     MONGO_URI: string;
     REDIS_HOST: string;
     REDIS_PORT: string;
