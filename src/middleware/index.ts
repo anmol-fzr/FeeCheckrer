@@ -16,3 +16,4 @@ export * from "./role.middleware";
 export * from "./paginate.middleware";
 export * from "./respTime.middleware";
 export * from "./cacheControll.middleware";
+export * from "./logger.middleware";

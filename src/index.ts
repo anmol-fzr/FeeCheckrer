@@ -9,9 +9,9 @@ import {
   studentRouter,
   studentsRouter,
   feesRouter,
-} from "./router";
-import { logger } from "hono/logger";
-import { xRespTime, httpCacheControll } from "./middleware";
+} from "@/router";
+import { xRespTime, httpCacheControll, logger } from "@/middleware";
+import { requestId } from "hono/request-id";
 
 startup();
 
@@ -26,7 +26,8 @@ app.use(
   }),
 );
 
-app.use(logger());
+app.use(requestId());
+app.use(logger);
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");

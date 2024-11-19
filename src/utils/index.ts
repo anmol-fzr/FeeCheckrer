@@ -14,3 +14,4 @@ function genOtp() {
 export { getAggrForPagintn, getRand, genOtp };
 export * from "./regex";
 export * from "./envs";
+export * from "./logger";
