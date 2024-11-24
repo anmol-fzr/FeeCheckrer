@@ -1,12 +1,8 @@
 import { z } from "zod";
 import { isNumValid } from "../helper";
 
-function createClampedNumSchema(
-	message: string,
-	minChars: number,
-	maxChars?: number,
-) {
-	maxChars ??= minChars;
+function createClampedNumSchema(message: string, minChars: number) {
+	const maxChars = minChars;
 	const schema = z
 		.string()
 		.min(minChars)

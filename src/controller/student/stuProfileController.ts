@@ -40,7 +40,7 @@ const updateProfileHndlr = createHandlers(
 				data: updatedStudent,
 				message: "Profile Updated Successfully",
 			});
-		} catch (err: any) {
+		} catch (err: unknown) {
 			if (err.code === 11000) {
 				const path = Object.keys(err.keyPattern)[0];
 

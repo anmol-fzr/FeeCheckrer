@@ -8,6 +8,7 @@ import { envs, genOtp } from "../../utils";
 import { redisClient } from "../../config/redis.config";
 import { jwt } from "../../middleware";
 import { capitalCase } from "change-case";
+import mongoose from "mongoose";
 
 const { createHandlers } = createFactory();
 const { getLoginToken, getFullToken } = jwtsHelper.student;
@@ -38,7 +39,7 @@ const loginStuHndlr = createHandlers(
 		if (otp !== Number(savedOtp)) {
 			return c.json(
 				{
-					message: `Incorrect OTP`,
+					message: "Incorrect OTP",
 				},
 				400,
 			);
@@ -62,7 +63,7 @@ const loginStuHndlr = createHandlers(
 				isNewUser,
 				token: loginToken,
 			},
-			message: `Login Successfully`,
+			message: "Login Successfully",
 		});
 	},
 );
@@ -91,9 +92,9 @@ const registerStuHndlr = createHandlers(
 				data: { token },
 				message: "Registered Successfully",
 			});
-		} catch (err: any) {
-			if (err.code === 11000) {
-				const path = Object.keys(err.keyPattern)[0];
+		} catch (err: unknown) {
+			if (err?.code === 11000) {
+				const path = Object.keys(err?.keyPattern)[0];
 
 				const message = `A user with this ${capitalCase(path)} already exists.`;
 

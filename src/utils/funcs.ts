@@ -1,6 +1,6 @@
 import type { Aggregate } from "mongoose";
 
-function getAggrForPagintn<T extends unknown>(aggr: Aggregate<T>) {
+function getAggrForPagintn<T>(aggr: Aggregate<T>) {
 	return structuredClone(aggr.pipeline());
 }
 

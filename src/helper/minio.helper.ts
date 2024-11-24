@@ -21,7 +21,7 @@ async function uploadFeeReceipt({ studentId, feeId, file }: UploadFeeReceipt) {
 	const path = getFeeReceiptPath({ studentId, feeId });
 
 	const res = await minioClient.putObject(
-		`students`,
+		"students",
 		path,
 		Buffer.from(arr),
 		undefined,

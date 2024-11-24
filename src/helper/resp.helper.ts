@@ -52,7 +52,7 @@ const notFound = (c: Ctx, message: string) => {
 	);
 };
 
-const serverError = (c: Ctx, message: string, error?: any) => {
+const serverError = (c: Ctx, message: string, error?: unknown) => {
 	return c.json(
 		{
 			error,
