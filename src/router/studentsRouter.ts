@@ -8,7 +8,7 @@ studentsRouter.use(jwt);
 studentsRouter.use(byRole(["superadmin", "hod", "clerk"]));
 
 studentsRouter
-  .get("/", ...getStudentsHndlr)
-  .get("/:studentId", ...getStudentHndlr);
+	.get("/", ...getStudentsHndlr)
+	.get("/:studentId", ...getStudentHndlr);
 
 export { studentsRouter };

@@ -1,12 +1,22 @@
 import { z } from "zod";
 
-const isNumValid = (val: number) => {
-  return !Number.isNaN(val);
-};
+function isNumValid(val: number) {
+	return !Number.isNaN(val);
+}
 
 const paginationSchema = z.object({
-  page: z.coerce.number().optional(),
-  size: z.coerce.number().optional(),
+	page: z.coerce.number().optional(),
+	size: z.coerce.number().optional(),
 });
 
-export { isNumValid, paginationSchema };
+function createQueryParamSchema<T extends string>(arr: ReadonlyArray<T>) {
+	const enumSchema = z.enum(arr as [T]);
+	const schema = z
+		.union([enumSchema, z.array(enumSchema)])
+		.transform((val) => (typeof val === "string" ? [val] : val))
+		.optional();
+
+	return schema;
+}
+
+export { isNumValid, paginationSchema, createQueryParamSchema };

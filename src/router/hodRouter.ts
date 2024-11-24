@@ -8,9 +8,9 @@ hodRouter.use(jwt);
 hodRouter.use(byRole("superadmin"));
 
 hodRouter
-  .get("/", ...getHodHndlr)
-  .post(...newHodHndlr)
-  .get("/:adminId", ...getHodHndlr)
-  .patch(...updateHodHndlr);
+	.get("/", ...getHodHndlr)
+	.post(...newHodHndlr)
+	.get("/:adminId", ...getHodHndlr)
+	.patch(...updateHodHndlr);
 
 export { hodRouter };

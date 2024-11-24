@@ -9,70 +9,70 @@ const { createHandlers } = createFactory();
 const { getLoginToken } = jwtsHelper.user;
 
 const loginHndlr = createHandlers(
-  zValidator("json", loginSchema),
-  async (c) => {
-    const { email, password: rawPassword } = c.req.valid("json");
+	zValidator("json", loginSchema),
+	async (c) => {
+		const { email, password: rawPassword } = c.req.valid("json");
 
-    const foundUser = await User.findOne({ email })
-      .select("name role password")
-      .lean();
+		const foundUser = await User.findOne({ email })
+			.select("name role password")
+			.lean();
 
-    if (!foundUser) {
-      return notFound(c, "User doesn't Exists");
-    }
+		if (!foundUser) {
+			return notFound(c, "User doesn't Exists");
+		}
 
-    const passwordMatched = await Bun.password.verify(
-      rawPassword,
-      foundUser.password,
-    );
+		const passwordMatched = await Bun.password.verify(
+			rawPassword,
+			foundUser.password,
+		);
 
-    if (!passwordMatched) {
-      return badReq(c, "Incorrect Password");
-    }
+		if (!passwordMatched) {
+			return badReq(c, "Incorrect Password");
+		}
 
-    const { _id, name, role } = foundUser;
+		const { _id, name, role } = foundUser;
 
-    const token = await getLoginToken({
-      _id: _id.toString(),
-      name,
-      role,
-    });
+		const token = await getLoginToken({
+			_id: _id.toString(),
+			name,
+			role,
+		});
 
-    return c.json({
-      data: {
-        name,
-        role,
-        email,
-        token,
-      },
-      message: "Logged in Successfully",
-    });
-  },
+		return c.json({
+			data: {
+				name,
+				role,
+				email,
+				token,
+			},
+			message: "Logged in Successfully",
+		});
+	},
 );
 
 const updateAccountHndlr = createHandlers(
-  jwt,
-  zValidator("json", updateAccountSchema),
-  async (c) => {
-    const { _id: userId } = c.get("jwtPayload");
-    const { password: rawPass } = c.req.valid("json");
+	jwt,
+	zValidator("json", updateAccountSchema),
+	async (c) => {
+		const { _id: userId } = c.get("jwtPayload");
+		const { password: rawPass } = c.req.valid("json");
 
-    const password = await passHelper.getHashedPassword(rawPass);
+		const password = await passHelper.getHashedPassword(rawPass);
 
-    const foundUser = await User.findByIdAndUpdate(
-      userId,
-      { password },
-      { new: true },
-    );
+		const foundUser = await User.findByIdAndUpdate(
+			userId,
+			{ password },
+			{ new: true },
+		);
 
-    if (!foundUser) {
-      return unauth(c);
-    }
+		if (!foundUser) {
+			return unauth(c);
+		}
 
-    await foundUser.save();
+		await foundUser.save();
 
-    return c.json({ data: null, message: "Account Updated Successfully" });
-  },
+		return c.json({ data: null, message: "Account Updated Successfully" });
+	},
 );
 
 export { loginHndlr, updateAccountHndlr };

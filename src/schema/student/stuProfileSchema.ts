@@ -1,32 +1,28 @@
 import { z } from "zod";
 import { isNumValid } from "../helper";
 
+function createClampedNumSchema(
+	message: string,
+	minChars: number,
+	maxChars?: number,
+) {
+	maxChars ??= minChars;
+	const schema = z
+		.string()
+		.min(minChars)
+		.max(maxChars)
+		.transform(Number)
+		.refine(isNumValid, { message });
+
+	return schema;
+}
+
 const stuNewProfileSchema = z.object({
-  name: z.string(),
-  mobile: z
-    .string()
-    .min(10)
-    .max(10)
-    .transform(Number)
-    .refine(isNumValid, { message: "Invalid Mobile Number" }),
-  admissionNo: z
-    .string()
-    .min(8)
-    .max(8)
-    .transform(Number)
-    .refine(isNumValid, { message: "Invalid Admission Number" }),
-  rollNo: z
-    .string()
-    .min(6)
-    .max(6)
-    .transform(Number)
-    .refine(isNumValid, { message: "Invalid Roll Number" }),
-  batch: z
-    .string()
-    .min(4)
-    .max(4)
-    .transform(Number)
-    .refine(isNumValid, { message: "Invalid Batch Year" }),
+	name: z.string(),
+	mobile: createClampedNumSchema("Invalid Mobile Number", 10),
+	admissionNo: createClampedNumSchema("Invalid Admission Number", 8),
+	rollNo: createClampedNumSchema("Invalid Roll Number", 6),
+	batch: createClampedNumSchema("Invalid Batch Number", 4),
 });
 
 const stuProfileUpdateSchema = stuNewProfileSchema.partial();

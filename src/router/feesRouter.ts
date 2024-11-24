@@ -8,8 +8,8 @@ feesRouter.use(jwt);
 feesRouter.use(byRole(["superadmin", "hod", "clerk"]));
 
 feesRouter
-  .get("/", ...getFeesHndlr)
-  .get("/:feeId", ...getFeeHndlr)
-  .patch(...updateFeeHndlr);
+	.get("/", ...getFeesHndlr)
+	.get("/:feeId", ...getFeeHndlr)
+	.patch(...updateFeeHndlr);
 
 export { feesRouter };

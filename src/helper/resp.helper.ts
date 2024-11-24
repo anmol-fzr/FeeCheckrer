@@ -1,63 +1,66 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 import { getChildLogger } from "@/utils";
+import type { BlankEnv, BlankPath } from "../types";
 
-const badReq = (c: Context<any, any>, message: string, error?: any) => {
-  const requestId = c.get("requestId");
+type Ctx = Context<BlankEnv, BlankPath>;
 
-  const logger = getChildLogger(requestId);
+const badReq = (c: Ctx, message: string, error?: unknown) => {
+	const requestId = c.get("requestId");
 
-  logger.error(message, {
-    error,
-  });
+	const logger = getChildLogger(requestId);
 
-  return c.json(
-    {
-      error,
-      data: null,
-      message,
-    },
-    400,
-  );
+	logger.error(message, {
+		error,
+	});
+
+	return c.json(
+		{
+			error,
+			data: null,
+			message,
+		},
+		400,
+	);
 };
 
-const unauth = (c: Context<any, any>) => {
-  const requestId = c.get("requestId");
+const unauth = (c: Ctx) => {
+	const requestId = c.get("requestId");
 
-  const logger = getChildLogger(requestId);
-  const message = "Unauthorized";
+	const logger = getChildLogger(requestId);
+	const message = "Unauthorized";
 
-  logger.error(message, {
-    error: message,
-  });
+	logger.error(message, {
+		error: message,
+	});
 
-  return c.json(
-    {
-      data: null,
-      message,
-    },
-    401,
-  );
+	return c.json(
+		{
+			data: null,
+			message,
+		},
+		401,
+	);
 };
 
-const notFound = (c: Context<any, any>, message: string) => {
-  return c.json(
-    {
-      data: null,
-      message,
-    },
-    404,
-  );
+const notFound = (c: Ctx, message: string) => {
+	return c.json(
+		{
+			data: null,
+			message,
+		},
+		404,
+	);
 };
 
-const serverError = (c: Context<any, any>, message: string, error?: any) => {
-  return c.json(
-    {
-      error,
-      data: null,
-      message,
-    },
-    500,
-  );
+const serverError = (c: Ctx, message: string, error?: any) => {
+	return c.json(
+		{
+			error,
+			data: null,
+			message,
+		},
+		500,
+	);
 };
 
 export { badReq, unauth, notFound, serverError };

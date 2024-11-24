@@ -5,9 +5,9 @@ const atLeastOneLowerCase = /[a-z]/;
 const sbCollectRegex = /^[A-Z]{3}\d+$/;
 
 export {
-  atLeastOneNum,
-  atLeastOneUpperCase,
-  atLeastOneLowerCase,
-  numsOnly,
-  sbCollectRegex,
+	atLeastOneNum,
+	atLeastOneUpperCase,
+	atLeastOneLowerCase,
+	numsOnly,
+	sbCollectRegex,
 };
