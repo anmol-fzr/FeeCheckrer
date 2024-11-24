@@ -48,6 +48,7 @@ const searchFeeSchema = z
 		feeType: createQueryParamSchema(feeTypes),
 		status: createQueryParamSchema(feeStatuses),
 		sem: createQueryParamSchema(sems),
+		name: z.string().optional(),
 	})
 	.and(paginationSchema);
 

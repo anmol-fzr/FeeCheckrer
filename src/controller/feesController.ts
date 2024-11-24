@@ -66,7 +66,7 @@ const getFeesHndlr = createHandlers(
 	zValidator("query", searchFeeSchema),
 	async (c) => {
 		const aggr = new Aggregate();
-		const { status, sem, feeType } = c.req.valid("query");
+		const { name, status, sem, feeType } = c.req.valid("query");
 
 		aggr.lookup({
 			localField: "studentId",
@@ -79,6 +79,18 @@ const getFeesHndlr = createHandlers(
 			path: "$student",
 			preserveNullAndEmptyArrays: true,
 		});
+
+		if (name) {
+			aggr.match({
+				$expr: {
+					$regexMatch: {
+						input: { $toString: "$student.name" },
+						regex: name,
+						options: "i",
+					},
+				},
+			});
+		}
 
 		if (feeType && feeType.length > 0) {
 			aggr.match({
