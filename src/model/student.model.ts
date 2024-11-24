@@ -1,4 +1,5 @@
-import { type Model, model, ObjectId, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
+import type { Model } from "mongoose";
 
 type IStudent = {
 	email: string;
