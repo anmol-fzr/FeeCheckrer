@@ -2,6 +2,7 @@
   "name": "server",
   "scripts": {
     "dev": "bun run check && bun run --watch src/index.ts",
+    "format": "bunx biome format --write src/",
     "check": "bun run ./src/utils/check.ts"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "zod-to-ts": "^1.2.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@types/bun": "latest"
   }
 }
