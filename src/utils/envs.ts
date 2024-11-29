@@ -14,7 +14,6 @@ const envs = Object.freeze({
 	}),
 
 	MINIO: Object.freeze({
-		IP: env.MINIO_IP,
 		HOST: env.MINIO_HOST,
 		PORT: env.MINIO_PORT,
 		ACCESS_KEY: env.MINIO_ACCESS_KEY,
