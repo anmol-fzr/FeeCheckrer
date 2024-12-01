@@ -43,6 +43,10 @@ const updateFeeSchema = z.object({
 	rejection: z.string().optional(),
 });
 
+const feeTypeSchema = z.object({
+	name: z.string(),
+});
+
 const searchFeeSchema = z
 	.object({
 		feeType: createQueryParamSchema(feeTypes),
@@ -52,4 +56,4 @@ const searchFeeSchema = z
 	})
 	.and(paginationSchema);
 
-export { addFeeSchema, updateFeeSchema, searchFeeSchema };
+export { addFeeSchema, updateFeeSchema, searchFeeSchema, feeTypeSchema };

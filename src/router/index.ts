@@ -4,3 +4,4 @@ export * from "./clerkRouter";
 export * from "./studentRouter";
 export * from "./studentsRouter";
 export * from "./feesRouter";
+export * from "./metaRouter";

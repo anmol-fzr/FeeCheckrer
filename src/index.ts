@@ -41,6 +41,4 @@ app
 app.use(httpCacheControll);
 app.route("/student", studentRouter);
 
-//app.get("/meta", ...getMetaHndlr);
-
 export default app;
