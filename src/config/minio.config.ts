@@ -11,6 +11,4 @@ const minioClient = new Minio.Client({
 	secretKey: SECRET_KEY,
 });
 
-const baseMinioPath = `http://localhost:${PORT}`;
-
-export { minioClient, baseMinioPath };
+export { minioClient };

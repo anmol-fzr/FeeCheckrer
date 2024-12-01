@@ -1,11 +1,10 @@
 import { Factory } from "hono/factory";
 import { Aggregate } from "mongoose";
 import { Fee } from "../model";
-import { envs, getAggrForPagintn } from "../utils";
+import { getAggrForPagintn } from "../utils";
 import { zValidator } from "@hono/zod-validator";
 import { searchFeeSchema, updateFeeSchema } from "../schema";
 import { paginator } from "../middleware";
-import { baseMinioPath, minioClient } from "@/config";
 import { getFeeReceiptUri } from "@/helper";
 
 const { createHandlers } = new Factory();
@@ -32,10 +31,23 @@ const getFeeHndlr = createHandlers(async (c) => {
 		as: "student",
 	});
 
+	aggr.lookup({
+		localField: "feeType",
+		foreignField: "_id",
+		from: "fee-types",
+		as: "feetype",
+	});
+
+	aggr.unwind({
+		path: "$feetype",
+		preserveNullAndEmptyArrays: true,
+	});
+
 	aggr.unwind({
 		path: "$student",
 		preserveNullAndEmptyArrays: true,
 	});
+
 	const pipeline = aggr.pipeline();
 
 	const fee = await Fee.aggregate(pipeline);
@@ -68,15 +80,73 @@ const getFeesHndlr = createHandlers(
 		const aggr = new Aggregate();
 		const { name, status, sem, feeType } = c.req.valid("query");
 
+		aggr
+			.lookup({
+				localField: "studentId",
+				foreignField: "_id",
+				from: "students",
+				as: "student",
+			})
+			.unwind({
+				path: "$student",
+				preserveNullAndEmptyArrays: true,
+			})
+			.project({
+				"student.createdAt": 0,
+				"student.updatedAt": 0,
+			});
+
+		aggr.addFields({
+			feeTypeId: {
+				$cond: {
+					if: {
+						$regexMatch: { input: "$feeType", regex: /^[0-9a-fA-F]{24}$/ },
+					},
+					then: { $toObjectId: "$feeType" },
+					else: null,
+				},
+			},
+		});
+
 		aggr.lookup({
-			localField: "studentId",
+			localField: "feeTypeId",
 			foreignField: "_id",
-			from: "students",
-			as: "student",
+			from: "fee-types",
+			as: "feeType",
+			pipeline: [
+				{
+					$match: {
+						$expr: {
+							$ne: ["$feeTypeId", null],
+						},
+					},
+				},
+			],
+		});
+
+		aggr
+			.addFields({
+				feeType: {
+					$cond: {
+						if: {
+							$eq: ["$feeTypeId", null],
+						},
+						then: "Any Other",
+						else: "$feeType.name",
+					},
+				},
+			})
+			.project({
+				feeTypeId: 0,
+			});
+
+		aggr.unwind({
+			path: "$feeTypeStr",
+			preserveNullAndEmptyArrays: true,
 		});
 
 		aggr.unwind({
-			path: "$student",
+			path: "$feeType",
 			preserveNullAndEmptyArrays: true,
 		});
 
@@ -132,8 +202,8 @@ const getFeesHndlr = createHandlers(
 		const total = await Fee.aggregate(pipelineForCount);
 
 		return c.json({
-			paginate: total[0],
 			data: fees,
+			paginate: total[0],
 		});
 	},
 );

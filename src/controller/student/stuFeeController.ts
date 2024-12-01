@@ -15,6 +15,11 @@ const addFeeHndlr = createHandlers(
 	jwt,
 	zValidator("form", addFeeSchema),
 	async (c) => {
+		//return c.json({
+		//	data: null,
+		//	message: "",
+		//});
+
 		const { studentId } = c.get("jwtPayload");
 		const body = c.req.valid("form");
 

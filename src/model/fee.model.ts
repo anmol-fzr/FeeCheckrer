@@ -47,7 +47,6 @@ const feeSchema = new Schema<IFee, Model<IFee>>(
 		},
 		feeType: {
 			type: Schema.Types.String,
-			enum: feeTypes,
 			required: true,
 		},
 		hostelFeeAmount: {
