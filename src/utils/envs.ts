@@ -8,6 +8,11 @@ const envs = Object.freeze({
 	PORT: env.PORT ?? 3000,
 	MONGO_URI: env.MONGO_URI,
 
+	APP_URI: Object.freeze({
+		ADMIN: env.ADMIN_URI,
+		STUDENT: env.STUDENT_URI,
+	}),
+
 	REDIS: Object.freeze({
 		PORT: env.REDIS_PORT ?? 6379,
 		HOST: env.REDIS_HOST,

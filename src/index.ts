@@ -12,8 +12,14 @@ import {
 } from "@/router";
 import { xRespTime, httpCacheControll, logger } from "@/middleware";
 import { requestId } from "hono/request-id";
+import { envs } from "./utils";
 
 startup();
+
+const {
+	APP_URI: { ADMIN, STUDENT },
+	PORT,
+} = envs;
 
 const app = new Hono();
 
@@ -22,7 +28,7 @@ app.use(etag());
 
 app.use(
 	cors({
-		origin: "*",
+		origin: [ADMIN, STUDENT],
 	}),
 );
 
@@ -41,4 +47,7 @@ app
 app.use(httpCacheControll);
 app.route("/student", studentRouter);
 
-export default app;
+export default {
+	port: PORT,
+	fetch: app.fetch,
+};
