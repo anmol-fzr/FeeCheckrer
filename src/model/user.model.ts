@@ -51,7 +51,6 @@ const userSchema = new Schema<IUser, Model<IUser>>(
 		},
 		deletedAt: {
 			type: Schema.Types.Date,
-			default: Date.now(),
 			required: false,
 		},
 	},
