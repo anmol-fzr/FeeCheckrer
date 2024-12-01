@@ -11,5 +11,9 @@ declare module "bun" {
     MINIO_PORT: string;
     MINIO_ACCESS_KEY: string;
     MINIO_SECRET_KEY: string;
+    SUPERADMIN_NAME: string;
+    SUPERADMIN_MOBILE: number;
+    SUPERADMIN_EMAIL: string;
+    SUPERADMIN_PASSWORD: string;
 } 
   }

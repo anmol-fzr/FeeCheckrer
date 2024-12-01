@@ -1,6 +1,7 @@
 {
 	"name": "server",
 	"scripts": {
+		"db:seed": "bun run ./src/scripts/mongo-init.ts",
 		"dev": "bun run check && bun run --watch src/index.ts",
 		"format": "bunx biome format --write src/",
 		"lint": "bunx biome lint --write src/",

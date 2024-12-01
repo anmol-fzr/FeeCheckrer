@@ -34,6 +34,11 @@ const envSchema = z.object({
 	MINIO_PORT: portSchema("MINIO_PORT"),
 	MINIO_ACCESS_KEY: z.string(),
 	MINIO_SECRET_KEY: z.string(),
+
+	SUPERADMIN_NAME: z.string(),
+	SUPERADMIN_MOBILE: z.coerce.number().transform(Number),
+	SUPERADMIN_EMAIL: z.string().email(),
+	SUPERADMIN_PASSWORD: z.string().min(5),
 });
 
 export { envSchema };

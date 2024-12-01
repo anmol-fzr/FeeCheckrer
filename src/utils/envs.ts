@@ -19,6 +19,13 @@ const envs = Object.freeze({
 		ACCESS_KEY: env.MINIO_ACCESS_KEY,
 		SECRET_KEY: env.MINIO_SECRET_KEY,
 	}),
+
+	SA: Object.freeze({
+		NAME: env.SUPERADMIN_NAME,
+		MOBILE: env.SUPERADMIN_MOBILE,
+		EMAIL: env.SUPERADMIN_EMAIL,
+		PASSWORD: env.SUPERADMIN_PASSWORD,
+	}),
 });
 
 export { envs };
