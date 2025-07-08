@@ -4,6 +4,7 @@ import { zValidator } from "@hono/zod-validator";
 import { User } from "@/model";
 import { badReq, notFound, passHelper, unauth, jwtsHelper } from "@/helper";
 import { jwt } from "@/middleware";
+import { envs } from "@/utils";
 
 const { createHandlers } = createFactory();
 const { getLoginToken } = jwtsHelper.user;
@@ -75,4 +76,45 @@ const updateAccountHndlr = createHandlers(
 	},
 );
 
-export { loginHndlr, updateAccountHndlr };
+const createDefaultAdminHndlr = createHandlers(async (c) => {
+	const { EMAIL, PASSWORD, NAME, MOBILE } = envs.SA;
+
+	const foundSA = await User.findOne({ role: "superadmin" });
+
+	if (foundSA) {
+		return c.json(
+			{
+				message: "Please Check Your Credentials",
+				error: "A Superadmin already Exists Exiting ...",
+			},
+			400,
+		);
+	}
+
+	const password = await passHelper.getHashedPassword(PASSWORD);
+
+	const sa = new User({
+		name: NAME,
+		role: "superadmin",
+		email: EMAIL,
+		password,
+		mobile: Number(MOBILE),
+	});
+
+	try {
+		const savedSA = await sa.save();
+		console.log("Superadmin Created SuccessFully with creds ", savedSA);
+		return c.json({
+			message: "Superadmin Created SuccessFully with creds ",
+		});
+	} catch (error) {
+		console.log("Unable to Create a new superadmin");
+		console.log(error);
+		return c.json({
+			message: "Unable to Create a new superadmin",
+			error,
+		});
+	}
+});
+
+export { loginHndlr, updateAccountHndlr, createDefaultAdminHndlr };
