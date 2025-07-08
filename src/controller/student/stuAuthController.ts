@@ -1,14 +1,14 @@
 import { createFactory } from "hono/factory";
 import { zValidator } from "@hono/zod-validator";
+
 import { stuLoginSchema, registerSchema } from "../../schema";
 import { Student } from "../../model";
 import { jwtsHelper, unauth } from "../../helper";
 import { publishOnMailQueue } from "../../helper/mail.helper";
 import { envs, genOtp } from "../../utils";
-import { redisClient } from "../../config/redis.config";
+import { cacheClient } from "@/config";
 import { jwt } from "../../middleware";
 import { capitalCase } from "change-case";
-import mongoose from "mongoose";
 
 const { createHandlers } = createFactory();
 const { getLoginToken, getFullToken } = jwtsHelper.student;
@@ -21,7 +21,7 @@ const loginStuHndlr = createHandlers(
 		if (!otp) {
 			const newOtp = envs.isDev ? 123456 : genOtp();
 
-			redisClient.setex(email, 600, newOtp);
+			cacheClient.add(email, newOtp);
 
 			publishOnMailQueue({
 				type: "login-otp",
@@ -34,7 +34,7 @@ const loginStuHndlr = createHandlers(
 			});
 		}
 
-		const savedOtp = await redisClient.getex(email);
+		const savedOtp = cacheClient.get(email);
 
 		if (otp !== Number(savedOtp)) {
 			return c.json(

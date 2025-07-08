@@ -13,11 +13,6 @@ const envs = Object.freeze({
 		STUDENT: env.STUDENT_URI,
 	}),
 
-	REDIS: Object.freeze({
-		PORT: env.REDIS_PORT ?? 6379,
-		HOST: env.REDIS_HOST,
-	}),
-
 	MINIO: Object.freeze({
 		HOST: env.MINIO_HOST,
 		PORT: env.MINIO_PORT,

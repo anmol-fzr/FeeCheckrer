@@ -25,9 +25,6 @@ const envSchema = z.object({
 
 	MONGO_URI: z.string().url(),
 
-	REDIS_HOST: z.string(),
-	REDIS_PORT: portSchema("REDIS_PORT"),
-
 	AMQP_URI: z.string().url(),
 	PORT: portSchema("PORT"),
 
