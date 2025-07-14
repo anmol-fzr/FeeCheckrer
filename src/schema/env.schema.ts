@@ -17,28 +17,32 @@ const portSchema = (label: string) =>
  * All Variable will be in string parse it here and use in the project
  * */
 
-const envSchema = z.object({
-	MODE: z.enum(["DEV", "PROD"]).default("DEV"),
+const envSchema = z
+	.object({
+		MODE: z.enum(["DEV", "PROD"]).default("DEV"),
 
-	ADMIN_URI: z.string().url(),
-	STUDENT_URI: z.string().url(),
+		ADMIN_URI: z.string().url(),
+		STUDENT_URI: z.string().url(),
 
-	MONGO_URI: z.string().url(),
+		MONGO_URI: z.string().url(),
 
-	AMQP_URI: z.string().url(),
-	PORT: portSchema("PORT"),
+		PORT: portSchema("PORT"),
 
-	JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+		JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
 
-	MINIO_HOST: z.union([z.string().ip(), z.enum(["localhost"])]),
-	MINIO_PORT: portSchema("MINIO_PORT"),
-	MINIO_ACCESS_KEY: z.string(),
-	MINIO_SECRET_KEY: z.string(),
+		MINIO_HOST: z.union([z.string().ip(), z.enum(["localhost"])]),
+		MINIO_PORT: portSchema("MINIO_PORT"),
+		MINIO_ACCESS_KEY: z.string(),
+		MINIO_SECRET_KEY: z.string(),
 
-	SUPERADMIN_NAME: z.string(),
-	SUPERADMIN_MOBILE: z.coerce.number().transform(Number),
-	SUPERADMIN_EMAIL: z.string().email(),
-	SUPERADMIN_PASSWORD: z.string().min(5),
-});
+		SUPERADMIN_NAME: z.string(),
+		SUPERADMIN_MOBILE: z.coerce.number().transform(Number),
+		SUPERADMIN_EMAIL: z.string().email(),
+		SUPERADMIN_PASSWORD: z.string().min(5),
+
+		GMAIL_ADDR: z.string().email(),
+		GMAIL_PASS: z.string(),
+	})
+	.strip();
 
 export { envSchema };

@@ -4,11 +4,11 @@ import { zValidator } from "@hono/zod-validator";
 import { stuLoginSchema, registerSchema } from "../../schema";
 import { Student } from "../../model";
 import { jwtsHelper, unauth } from "../../helper";
-import { publishOnMailQueue } from "../../helper/mail.helper";
 import { envs, genOtp } from "../../utils";
 import { cacheClient } from "@/config";
 import { jwt } from "../../middleware";
 import { capitalCase } from "change-case";
+import { sendMail } from "@/utils/mail";
 
 const { createHandlers } = createFactory();
 const { getLoginToken, getFullToken } = jwtsHelper.student;
@@ -23,8 +23,12 @@ const loginStuHndlr = createHandlers(
 
 			cacheClient.add(email, newOtp);
 
-			publishOnMailQueue({
-				type: "login-otp",
+			console.log({
+				email,
+				otp: newOtp,
+			});
+
+			sendMail({
 				email,
 				otp: newOtp,
 			});

@@ -86,59 +86,9 @@ services:
       - ./FeeCheckrer:/app
     depends_on:
       - mongodb
-      - rabbitmq
       - minio
-      - redis
-      - fee-mailer
     healthcheck:
       test: ["CMD", "curl", "-I", "http://localhost:3000/health"] 
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-
-  rabbitmq:
-    image: rabbitmq:alpine
-    container_name: rabbitmq
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    env_file: ".rabbitmq.env"
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-    networks:
-      - feecheckr
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-
-  fee-mailer:
-    build: "./FeeMailer"
-    container_name: fee-mailer
-    ports: 
-      - "6546:6546"
-    env_file: ".feemailer.env"
-    volumes:
-      - ./FeeMailer:/app
-    depends_on:
-      - rabbitmq
-    networks:
-      - feecheckr
-    healthcheck:
-      test: ["CMD", "curl", "-I", "http://localhost:6546"] 
       interval: 30s
       timeout: 10s
       retries: 3
@@ -157,8 +107,10 @@ services:
       - 9001:9001
     networks:
       - feecheckr
-    env_file:
-      - .minio.env
+    environment:
+      - MINIO_ROOT_USER=root
+      - MINIO_ROOT_PASSWORD=password
+      - MINIO_DEFAULT_BUCKETS=students
     volumes:
       - ./minio-data:/data
     restart: always
@@ -179,6 +131,4 @@ volumes:
   mongo-data:
     driver: local
   minio-data:
-    driver: local
-  rabbitmq-data: 
     driver: local

@@ -15,6 +15,8 @@ declare module "bun" {
 		SUPERADMIN_MOBILE: number;
 		SUPERADMIN_EMAIL: string;
 		SUPERADMIN_PASSWORD: string;
+		GMAIL_ADDR: string;
+		GMAIL_PASS: string;
 	}
 }
 

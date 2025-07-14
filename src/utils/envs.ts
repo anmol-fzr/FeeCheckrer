@@ -3,7 +3,6 @@ const env = process.env;
 const envs = Object.freeze({
 	isDev: env.MODE === "DEV",
 
-	AMQP_URI: env.AMQP_URI,
 	JWT_SECRET: env.JWT_SECRET,
 	PORT: env.PORT ?? 3000,
 	MONGO_URI: env.MONGO_URI,
@@ -25,6 +24,11 @@ const envs = Object.freeze({
 		MOBILE: env.SUPERADMIN_MOBILE,
 		EMAIL: env.SUPERADMIN_EMAIL,
 		PASSWORD: env.SUPERADMIN_PASSWORD,
+	}),
+
+	GMAIL: Object.freeze({
+		ADDRESS: env.GMAIL_ADDR,
+		PASS: env.GMAIL_PASS,
 	}),
 });
 
