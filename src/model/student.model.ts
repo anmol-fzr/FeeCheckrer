@@ -1,31 +1,60 @@
-import { Model, model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
+import type { Model } from "mongoose";
 
-type IUser = {
-  email: string;
-  password: string;
+type IStudent = {
+	email: string;
+	name: string;
+	mobile: number;
+	admissionNo: number;
+	rollNo: number;
+	batch: number;
+	avatar?: string;
 };
 
-const userSchema = new Schema<IUser, Model<IUser>>(
-  {
-    email: {
-      type: Schema.Types.String,
-      required: true,
-      index: true,
-      unique: true,
-    },
-    password: {
-      type: Schema.Types.String,
-      required: true,
-      index: true,
-      unique: true,
-    },
-  },
-  {
-    timestamps: true,
-    versionKey: false,
-  },
+const studentSchema = new Schema<IStudent, Model<IStudent>>(
+	{
+		email: {
+			type: Schema.Types.String,
+			required: true,
+			index: true,
+			unique: true,
+		},
+		avatar: {
+			type: Schema.Types.String,
+			required: false,
+		},
+		name: {
+			type: Schema.Types.String,
+			required: true,
+		},
+		mobile: {
+			type: Schema.Types.Number,
+			required: true,
+		},
+		admissionNo: {
+			type: Schema.Types.Number,
+			required: true,
+			index: true,
+			unique: true,
+		},
+		rollNo: {
+			type: Schema.Types.Number,
+			required: true,
+			index: true,
+			unique: true,
+		},
+		batch: {
+			type: Schema.Types.Number,
+			required: true,
+			index: true,
+		},
+	},
+	{
+		timestamps: true,
+		versionKey: false,
+	},
 );
 
-const User = model<IUser>("student", userSchema);
+const Student = model<IStudent>("student", studentSchema);
 
-export { User };
+export { Student };

@@ -1,36 +1,53 @@
 import { Hono } from "hono";
 import { startup } from "./helper";
 import { cors } from "hono/cors";
+import { etag } from "hono/etag";
 import {
-  authRouter,
-  adminRouter,
-  clerkRouter,
-  deptRouter,
-  courseRouter,
-} from "./router";
-import { logger } from "hono/logger";
-import { getMetaHndlr } from "./controller";
+	authRouter,
+	clerkRouter,
+	hodRouter,
+	studentRouter,
+	studentsRouter,
+	feesRouter,
+} from "@/router";
+import { xRespTime, httpCacheControll, logger } from "@/middleware";
+import { requestId } from "hono/request-id";
+import { envs } from "./utils";
 
 startup();
 
+const {
+	APP_URI: { ADMIN, STUDENT },
+	PORT,
+} = envs;
+
 const app = new Hono();
+
+app.use(xRespTime);
+app.use(etag());
+
 app.use(
-  cors({
-    origin: "*",
-  }),
+	cors({
+		origin: [ADMIN, STUDENT],
+	}),
 );
 
-app.use(logger());
+app.use(requestId());
+app.use(logger);
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
+app.on("GET", ["/", "/health"], (c) => c.text("Hello FeeCheckrer!"));
 
-app.route("/auth", authRouter);
-app.route("/admin", adminRouter);
-app.route("/clerk", clerkRouter);
-app.route("/dept", deptRouter);
-app.route("/course", courseRouter);
-app.get("/meta", ...getMetaHndlr);
+app
+	.route("/auth", authRouter)
+	.route("/hod", hodRouter)
+	.route("/clerk", clerkRouter)
+	.route("/students", studentsRouter)
+	.route("/fees", feesRouter);
 
-export default app;
+app.use(httpCacheControll);
+app.route("/student", studentRouter);
+
+export default {
+	port: PORT,
+	fetch: app.fetch,
+};

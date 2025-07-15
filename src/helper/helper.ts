@@ -1,7 +1,7 @@
 import { connnectMongo } from "../config";
 
 const startup = () => {
-  connnectMongo();
+	connnectMongo();
 };
 
 export { startup };
