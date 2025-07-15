@@ -1,4 +1,30 @@
-# FeeCheckr
+# 📦 FeeCheckrer
+Backend Service for Fee Submission and Verification
+
+FeeCheckrer is the backend API server responsible for handling business logic, authentication, and data management.
+
+Built with: Hono (TypeScript)
+
+Database: MongoDB
+
+Storage: MinIO (S3-compatible, for local development)
+
+Features:
+- RESTful APIs for student submission and admin verification
+- JWT-based authentication
+- MongoDB integration for data persistence
+- MinIO-based file upload system for document storage
+
+
+# 🐳 Deployment
+All modules are containerized using Docker and orchestrated with Docker Compose for easy local setup and development.
+
+## Modules
+
+- [Server](https://github.com/anmol-fzr/FeeCheckrer)
+- [Admin Portal](https://github.com/anmol-fzr/FeeCheckr)
+- [Server for Mails Only](https://github.com/anmol-fzr/FeeMailer)
+- [Student Portal](https://github.com/anmol-fzr/FeeGiver)
 
 ## Requirements
 
@@ -27,7 +53,7 @@ https://github.com/anmol-fzr/FeeCheckr
 
 4. Clone the mailing server ( FeeMailer )
 ```
-https://github.com/anmol-fzr/FeeCheckrer
+https://github.com/anmol-fzr/FeeMailer
 ```
 
 5. Clone the student application ( FeeGiver )
