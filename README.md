@@ -8,7 +8,7 @@
 ## Steps To Get Started
 
 ```
-curl https://raw.githubusercontent.com/anmol-fzr/FeeCheckrer/refs/heads/dev/setup.sh?token=GHSAT0AAAAAAC2SMOF45QXVDVEFLGBLPMWOZ2DFBPQ | sh
+curl https://raw.githubusercontent.com/anmol-fzr/FeeCheckrer/refs/heads/dev/setup.sh | sh
 ```
 
 
